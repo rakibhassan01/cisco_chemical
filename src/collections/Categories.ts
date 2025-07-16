@@ -7,7 +7,5 @@ export const Categories: CollectionConfig = {
   },
   auth: true,
   fields: [
-    // Email added by default
-    // Add more fields as needed
   ],
 };

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
 import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -16,8 +17,17 @@ export const Navbar = () => {
     <header className="w-full border-b bg-white">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-black">
-          Cisco Chem
+        <Link
+          href="/"
+          className="flex items-center space-x-2 text-2xl font-bold text-black"
+        >
+          <Image
+            src="/images/footer-logo.png"
+            alt="Logo"
+            width={40}
+            height={40}
+          />
+          <span>Cisco Chem</span>
         </Link>
 
         {/* Desktop Nav */}

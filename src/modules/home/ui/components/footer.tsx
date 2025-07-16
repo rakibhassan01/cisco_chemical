@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Twitter, Youtube, Facebook } from "lucide-react";
 import Image from "next/image";
+import { Twitter, Youtube, Facebook } from "lucide-react";
 
 export const Footer = () => {
   return (
