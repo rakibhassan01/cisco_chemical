@@ -1,69 +1,166 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Youtube, Facebook } from "lucide-react";
+import {
+  Youtube,
+  Facebook,
+  Mail,
+  MapPin,
+  Phone,
+  ChevronRight,
+} from "lucide-react";
 
 export const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-gray-100 border-t text-sm text-gray-700">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-6 py-12">
-        {/* Logo & Description */}
-        <div className="space-y-2">
-          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
-          <p className="font-medium">Cisco Chemicals Inc.</p>
-          <p>Providing reliable service since 1992</p>
+    <footer className="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
+          {/* Company Info */}
+          <div className="space-y-6">
+            <div className="flex items-center space-x-3 group">
+              <div className="relative w-12 h-12 overflow-hidden p-2 transition-all duration-300">
+                <Image
+                  src="/images/logo.png"
+                  alt="Cisco Chemicals Logo"
+                  fill
+                  className="object-contain transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">
+                  Cisco Chemicals
+                </h3>
+                <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                  Inc.
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              Providing reliable chemical solutions and services since 1992.
+              Your trusted partner for quality and innovation.
+            </p>
+
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
+                <Phone className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm">+1 (555) 123-4567</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
+                <Mail className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm">info@ciscochem.com</span>
+              </div>
+              <div className="flex items-start space-x-3 text-gray-600 dark:text-gray-300">
+                <MapPin className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5" />
+                <span className="text-sm">
+                  123 Chemical Avenue
+                  <br />
+                  Industrial District, NY 10001
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Services */}
+          <div className="space-y-6">
+            <h4 className="font-bold text-lg text-gray-900 dark:text-white relative">
+              Services
+              <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-green-600 to-green-400 dark:from-green-400 dark:to-green-300"></div>
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { label: "Chemical Branding", href: "/services/branding" },
+                { label: "Product Design", href: "/services/design" },
+                { label: "Market Analysis", href: "/services/marketing" },
+                { label: "Advertisement", href: "/services/advertisement" },
+                { label: "Consulting", href: "/services/consulting" },
+              ].map((service, index) => (
+                <li key={index}>
+                  <Link
+                    href={service.href}
+                    className="group flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300"
+                  >
+                    <ChevronRight className="w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300" />
+                    <span className="text-sm group-hover:underline underline-offset-2">
+                      {service.label}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div className="space-y-6">
+            <h4 className="font-bold text-lg text-gray-900 dark:text-white relative">
+              Company
+              <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-green-600 to-green-400 dark:from-green-400 dark:to-green-300"></div>
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Contact", href: "/contact" },
+                { label: "Careers", href: "/careers" },
+                { label: "Press Kit", href: "/press" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Terms of Service", href: "/terms" },
+              ].map((item, index) => (
+                <li key={index}>
+                  <Link
+                    href={item.href}
+                    className="group flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300"
+                  >
+                    <ChevronRight className="w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300" />
+                    <span className="text-sm group-hover:underline underline-offset-2">
+                      {item.label}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Social*/}
+          <div className="space-y-6">
+            <h4 className="font-bold text-lg text-gray-900 dark:text-white relative">
+              Connect With Us
+              <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-green-600 to-green-400 dark:from-green-400 dark:to-green-300"></div>
+            </h4>
+
+            {/* Social Links */}
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Follow us on social media for updates and industry insights.
+              </p>
+
+              <div className="flex items-center space-x-4">
+                <Link
+                  href="https://youtube.com"
+                  className="group relative p-3 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-400 shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <Youtube className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300" />
+                  <div className="absolute inset-0 rounded-full bg-red-50 dark:bg-red-950/20 scale-0 group-hover:scale-100 transition-transform duration-300 -z-10"></div>
+                </Link>
+
+                <Link
+                  href="https://facebook.com"
+                  className="group relative p-3 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-400 shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <Facebook className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" />
+                  <div className="absolute inset-0 rounded-full bg-blue-50 dark:bg-blue-950/20 scale-0 group-hover:scale-100 transition-transform duration-300 -z-10"></div>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Services */}
-        <div>
-          <p className="font-bold text-gray-800 mb-3">SERVICES</p>
-          <ul className="space-y-2">
-            <li>
-              <Link href="#">Branding</Link>
-            </li>
-            <li>
-              <Link href="#">Design</Link>
-            </li>
-            <li>
-              <Link href="#">Marketing</Link>
-            </li>
-            <li>
-              <Link href="#">Advertisement</Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Company */}
-        <div>
-          <p className="font-bold text-gray-800 mb-3">COMPANY</p>
-          <ul className="space-y-2">
-            <li>
-              <Link href="#">About us</Link>
-            </li>
-            <li>
-              <Link href="#">Contact</Link>
-            </li>
-            <li>
-              <Link href="#">Jobs</Link>
-            </li>
-            <li>
-              <Link href="#">Press kit</Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Social */}
-        <div>
-          <p className="font-bold text-gray-800 mb-3">SOCIAL</p>
-          <div className="flex items-center gap-4">
-            {/* <Link href="#">
-              <X className="w-5 h-5" />
-            </Link> */}
-            <Link href="#">
-              <Youtube className="w-5 h-5" />
-            </Link>
-            <Link href="#">
-              <Facebook className="w-5 h-5" />
-            </Link>
+        {/* Copyright moved to bottom */}
+        <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 text-center">
+            © {currentYear} Cisco Chemicals Inc. All rights reserved.
           </div>
         </div>
       </div>
