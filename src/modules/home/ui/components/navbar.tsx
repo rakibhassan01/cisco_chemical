@@ -51,8 +51,8 @@ export const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav - Center */}
-        <nav className="hidden lg:flex gap-8 absolute left-1/2 transform -translate-x-1/2">
+        {/* Desktop Nav - Center (Changed positioning) */}
+        <nav className="hidden lg:flex gap-8 flex-1 justify-center mx-8">
           {navLinks.map(({ href, label }, idx) => (
             <Link
               key={href}
@@ -67,7 +67,7 @@ export const Navbar = () => {
         </nav>
 
         {/* Right side - ThemeToggle + Login + Mobile Menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           {/* Theme Toggle - Desktop */}
           <div className="hidden sm:block">
             <ThemeToggle />
