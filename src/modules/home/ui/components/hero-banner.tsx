@@ -153,9 +153,11 @@ const HeroBanner: React.FC = () => {
 
             {/* Main Heading - with smooth transitions */}
             <div className="space-y-3 sm:space-y-4">
-              <h1 
+              <h1
                 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight transform transition-all duration-500 ease-in-out ${
-                  isTransitioning ? 'opacity-0 translate-y-4 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                  isTransitioning
+                    ? "opacity-0 translate-y-4 scale-95"
+                    : "opacity-100 translate-y-0 scale-100"
                 }`}
               >
                 <span className="block bg-gradient-to-r from-gray-900 via-green-600 to-green-500 dark:from-white dark:via-green-200 dark:to-green-400 bg-clip-text text-transparent">
@@ -167,9 +169,11 @@ const HeroBanner: React.FC = () => {
                   {slides[currentSlide].title.split(" ").slice(-1)}
                 </span>
               </h1>
-              <p 
+              <p
                 className={`text-lg sm:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 font-light transform transition-all duration-500 ease-in-out delay-75 ${
-                  isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+                  isTransitioning
+                    ? "opacity-0 translate-y-4"
+                    : "opacity-100 translate-y-0"
                 }`}
               >
                 {slides[currentSlide].subtitle}
@@ -177,9 +181,11 @@ const HeroBanner: React.FC = () => {
             </div>
 
             {/* Description */}
-            <p 
+            <p
               className={`text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl transform transition-all duration-500 ease-in-out delay-150 ${
-                isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+                isTransitioning
+                  ? "opacity-0 translate-y-4"
+                  : "opacity-100 translate-y-0"
               }`}
             >
               {slides[currentSlide].description}
@@ -301,11 +307,11 @@ const HeroBanner: React.FC = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-gray-600 dark:text-white/60 animate-bounce">
+      {/* <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-gray-600 dark:text-white/60 animate-bounce">
         <div className="w-5 sm:w-6 h-8 sm:h-10 border-2 border-gray-400 dark:border-white/30 rounded-full mx-auto flex justify-center">
           <div className="w-1 h-2 sm:h-3 bg-gray-600 dark:bg-white/60 rounded-full mt-2 animate-pulse" />
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };
