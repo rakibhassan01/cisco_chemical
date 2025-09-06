@@ -9,7 +9,7 @@ export const Footer = () => {
         {/* Logo & Description */}
         <div className="space-y-2">
           <Image
-            src="/images/footer-logo.png"
+            src="/images/logo.png"
             alt="Logo"
             width={50}
             height={50}

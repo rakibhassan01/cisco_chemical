@@ -29,9 +29,9 @@ export const SignUpView = () => {
           {/* Welcome Text Section */}
           <div className="text-white text-center lg:text-left">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              Hi 👋 Welcome Back.
+              Hi 👋 Welcome to Cisco
             </h1>
-            <p className="text-lg sm:text-xl opacity-90 leading-relaxed max-w-lg mx-auto lg:mx-0">
+            <p className="hidden sm:block text-lg sm:text-xl opacity-90 leading-relaxed max-w-lg mx-auto lg:mx-0">
               Lorem Ipsum is placeholder text commonly used in the graphic,
               print, and publishing industries for previewing layouts and visual
               mockups
@@ -57,7 +57,6 @@ export const SignUpView = () => {
                     Name
                   </label>
                   <input
-                  
                     type="text"
                     id="name"
                     name="name"
