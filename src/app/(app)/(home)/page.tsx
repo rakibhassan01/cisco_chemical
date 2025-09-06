@@ -1,8 +1,5 @@
+import { HomeView } from "@/modules/home/ui/home-view";
 
 export default function Home() {
-  return (
-    <div className="">
-      <h1>Cisco Chemical</h1>
-    </div>
-  );
+  return <HomeView />;
 }

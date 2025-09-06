@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Twitter, Youtube, Facebook } from "lucide-react";
+import { Youtube, Facebook } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -8,12 +8,7 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-6 py-12">
         {/* Logo & Description */}
         <div className="space-y-2">
-          <Image
-            src="/images/logo.png"
-            alt="Logo"
-            width={50}
-            height={50}
-          />
+          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
           <p className="font-medium">Cisco Chemicals Inc.</p>
           <p>Providing reliable service since 1992</p>
         </div>
@@ -60,9 +55,9 @@ export const Footer = () => {
         <div>
           <p className="font-bold text-gray-800 mb-3">SOCIAL</p>
           <div className="flex items-center gap-4">
-            <Link href="#">
-              <Twitter className="w-5 h-5" />
-            </Link>
+            {/* <Link href="#">
+              <X className="w-5 h-5" />
+            </Link> */}
             <Link href="#">
               <Youtube className="w-5 h-5" />
             </Link>
