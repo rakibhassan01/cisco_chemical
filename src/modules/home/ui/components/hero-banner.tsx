@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { AnimatedCounter } from "./animated-counter";
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronRight, Play, Beaker, Shield, Zap, Award } from "lucide-react";
 
@@ -22,87 +24,6 @@ interface MousePosition {
   y: number;
 }
 
-interface AnimatedCounterProps {
-  endValue: string;
-  duration?: number;
-  hasPlus?: boolean;
-  hasPercent?: boolean;
-}
-
-const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
-  endValue,
-  duration = 2000,
-  hasPlus = false,
-  // hasPercent = false,
-}) => {
-  const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const elementRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const numericValue = parseInt(endValue.replace(/[^\d]/g, ""));
-    let startTime: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-      const currentCount = Math.floor(easeOutCubic * numericValue);
-
-      setCount(currentCount);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [isVisible, endValue, duration]);
-
-  const formatCount = (value: number): string => {
-    if (endValue.includes("K")) {
-      if (value >= 1000) {
-        return Math.floor(value / 1000) + "K";
-      }
-      return value.toString();
-    }
-    return value.toString();
-  };
-
-  const displayValue =
-    endValue.includes("/") || endValue.includes("%")
-      ? endValue
-      : formatCount(count) + (hasPlus ? "+" : "");
-  const suffix = "";
-
-  return (
-    <span ref={elementRef} className="inline-block">
-      {displayValue}
-      {suffix}
-    </span>
-  );
-};
-
 const HeroBanner: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
@@ -114,32 +35,6 @@ const HeroBanner: React.FC = () => {
   const [statsVisible, setStatsVisible] = useState<boolean>(false);
   const statsRef = useRef<HTMLDivElement>(null);
 
-  // const slides: Slide[] = [
-  //   {
-  //     title: "Advanced Chemical Solutions",
-  //     subtitle: "Pioneering Innovation in Every Molecule",
-  //     description:
-  //       "Discover cutting-edge chemical compounds and solutions that drive industries forward with unmatched quality and precision.",
-  //     image: "/api/placeholder/800/600",
-  //     accent: "from-blue-600 to-cyan-500",
-  //   },
-  //   {
-  //     title: "Sustainable Chemistry",
-  //     subtitle: "Green Solutions for Tomorrow",
-  //     description:
-  //       "Leading the way in eco-friendly chemical processes that protect our planet while delivering exceptional performance.",
-  //     image: "/api/placeholder/800/600",
-  //     accent: "from-green-600 to-emerald-500",
-  //   },
-  //   {
-  //     title: "Laboratory Excellence",
-  //     subtitle: "Precision Meets Innovation",
-  //     description:
-  //       "State-of-the-art laboratory facilities and rigorous quality control ensure the highest standards in chemical manufacturing.",
-  //     image: "/api/placeholder/800/600",
-  //     accent: "from-purple-600 to-indigo-500",
-  //   },
-  // ];
   const slides: Slide[] = [
     {
       title: "Advanced Chemical Solutions",
@@ -325,8 +220,6 @@ const HeroBanner: React.FC = () => {
       `}</style>
 
       <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-gray-50 dark:from-slate-900 dark:via-gray-900 dark:to-black transition-colors duration-300">
-        {/* <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-gray-50 dark:from-slate-900 dark:via-gray-900 dark:to-black transition-colors duration-300 pt-16 lg:pt-20"> */}
-        {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Floating Molecules */}
           {Array.from({ length: 20 }, (_, i) => (
@@ -373,7 +266,7 @@ const HeroBanner: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-16 min-h-screen flex items-center">
+        <div className="relative z-10 lg:ml-10 mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-16 min-h-screen flex items-center">
           {/* <div className="relative z-10  max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 min-h-[calc(100vh-80px)] flex items-center"> */}
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
             {/* Left Content */}
@@ -456,15 +349,19 @@ const HeroBanner: React.FC = () => {
                 }`}
                 style={{ animationDelay: "1.2s" }}
               >
-                <button className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-green-500 rounded-full text-white font-semibold text-base sm:text-lg hover:from-green-500 hover:to-green-400 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden w-full sm:w-auto">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    <span className="hidden sm:inline">Explore Products</span>
-                    <span className="sm:hidden">Products</span>
-                    <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                <Link
+                  href="/products"
+                  className="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-green-500 rounded-full text-white font-semibold text-base sm:text-lg hover:from-green-500 hover:to-green-400 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden w-full sm:w-auto no-underline"
+                >
+                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                    <span className="hidden sm:inline leading-none">
+                      Explore Products
+                    </span>
+                    <span className="sm:hidden leading-none">Products</span>
+                    <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300 flex-shrink-0 mt-0.5" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
-
+                </Link>
                 <button className="group flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-300 dark:border-white/20 rounded-full text-gray-900 dark:text-white font-semibold text-base sm:text-lg hover:border-green-400 hover:bg-green-400/10 transition-all duration-300 backdrop-blur-sm w-full sm:w-auto">
                   <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gray-200/50 dark:bg-white/10 rounded-full flex items-center justify-center group-hover:bg-green-400/20 transition-colors duration-300">
                     <Play className="w-4 sm:w-5 h-4 sm:h-5 ml-1" />

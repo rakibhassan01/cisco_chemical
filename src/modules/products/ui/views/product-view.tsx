@@ -87,7 +87,7 @@ export function ProductsView() {
       description:
         "Environmentally friendly surfactant derived from renewable sources for sustainable applications.",
       image:
-        "https://images.unsplash.com/photo-1574263867128-a3d5c1b1deaa?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400&h=300&fit=crop",
       icon: <Leaf className="w-6 h-6" />,
       specs: [
         "Biodegradability: >90%",

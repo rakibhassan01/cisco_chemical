@@ -16,7 +16,7 @@ export const Footer = () => {
     <footer className="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700">
       <div className="max-w-8xl mx-auto px-6 lg:px-12 py-3 lg:py-4">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8 lg:ml-10">
           {/* Company Info */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3 group">
