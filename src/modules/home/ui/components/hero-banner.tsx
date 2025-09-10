@@ -146,7 +146,7 @@ const HeroBanner: React.FC = () => {
       subtitle: "Innovation in Every Molecule",
       description:
         "Cutting-edge compounds that power industries with precision, reliability, and breakthrough performance.",
-      image: "/images/chemistry-innovation.jpg",
+      image: "/images/Homepage-Carousel.webp",
       accent: "from-blue-600 to-cyan-500",
       // cta: { label: "Explore Products", href: "/products" },
     },
