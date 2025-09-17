@@ -71,7 +71,9 @@ export const Navbar = () => {
             <Image
               src="/images/logo.png"
               alt="Logo"
-              fill
+              // fill
+              width={40} // mobile default
+              height={40}
               className="object-contain transition-transform duration-300 group-hover:rotate-12"
               priority
             />
