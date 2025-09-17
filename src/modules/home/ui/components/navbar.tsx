@@ -73,6 +73,7 @@ export const Navbar = () => {
               alt="Logo"
               fill
               className="object-contain transition-transform duration-300 group-hover:rotate-12"
+              priority
             />
           </div>
           <span className="transition-colors duration-300 group-hover:text-green-600 dark:group-hover:text-green-400">
