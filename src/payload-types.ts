@@ -232,6 +232,7 @@ export interface Product {
  */
 export interface Order {
   id: string;
+  user: string | User;
   status?: ('pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') | null;
   total: number;
   items?:
@@ -409,6 +410,7 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
+  user?: T;
   status?: T;
   total?: T;
   items?:

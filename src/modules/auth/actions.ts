@@ -3,7 +3,8 @@
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export async function signUpAction(data: {
   email: string;
@@ -37,7 +38,7 @@ export async function signUpAction(data: {
     });
 
     // After sign up, log them in
-    await payload.login({
+    const result = await payload.login({
       collection: "users",
       data: {
         email: data.email,
@@ -46,17 +47,28 @@ export async function signUpAction(data: {
       // @ts-expect-error - Payload 3.0 type issues with server actions cookies
       res: await cookies(),
     });
+
+    if (result.token) {
+      const cookieStore = await cookies();
+      cookieStore.set("payload-token", result.token, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
   } catch (err: unknown) {
     console.error("Sign up error:", err);
     return { error: (err as Error).message || "Failed to create account" };
   }
 
-  redirect("/");
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
 export async function signInAction(data: { email: string; password: string }) {
   const payload = await getPayload({ config: configPromise });
-
   try {
     const result = await payload.login({
       collection: "users",
@@ -68,14 +80,26 @@ export async function signInAction(data: { email: string; password: string }) {
       res: await cookies(),
     });
 
-    if (!result.user) {
+    if (!result.user || !result.token) {
       return { error: "Invalid email or password" };
     }
-  } catch {
-    return { error: "Invalid email or password" };
-  }
 
-  redirect("/");
+    // Manually set the cookie as a failsafe
+    const cookieStore = await cookies();
+    cookieStore.set("payload-token", result.token, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax", // Crucial for local dev with different auth systems
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    console.error("signInAction error:", error);
+    return { error: "An error occurred during sign in" };
+  }
 }
 
 export async function signOutAction() {
@@ -85,12 +109,47 @@ export async function signOutAction() {
     collection: "users",
     res: await cookies(),
   });
+  revalidatePath("/", "layout");
   redirect("/sign-in");
 }
 
 export async function getCurrentUser() {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const userHeaders = await headers();
+    const { user } = await payload.auth({ headers: userHeaders });
+    return user;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
+}
+
+export async function updateUserAction(data: {
+  name?: string;
+  email?: string;
+  avatar?: string;
+}) {
   const payload = await getPayload({ config: configPromise });
-  // @ts-expect-error - Payload 3.0 type issues with server actions cookies
-  const { user } = await payload.auth({ headers: await cookies() });
-  return user;
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    const updatedUser = await payload.update({
+      collection: "users",
+      id: user.id,
+      data: {
+        ...data,
+      },
+    });
+
+    revalidatePath("/", "layout");
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error("updateUserAction error:", error);
+    return { error: "Failed to update profile" };
+  }
 }

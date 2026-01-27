@@ -1,6 +1,7 @@
 "use client";
 import { SocialLogin } from "../components/social-login";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +20,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const SignUpView = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -30,16 +32,13 @@ export const SignUpView = () => {
 
   const onSubmit = async (data: SignUpFormValues) => {
     setIsLoading(true);
-    try {
-      const result = await signUpAction(data);
-      if (result?.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Account created successfully!");
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
-    } finally {
+    const result = await signUpAction(data);
+    if (result?.success) {
+      toast.success("Account created successfully!");
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      toast.error(result?.error || "Failed to create account");
       setIsLoading(false);
     }
   };
@@ -64,8 +63,8 @@ export const SignUpView = () => {
               Hi 👋 Welcome to Cisco
             </h1>
             <p className="hidden sm:block text-lg sm:text-xl opacity-90 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Join us to experience exclusive benefits and seamless access to our
-              chemical solutions and industrial resources.
+              Join us to experience exclusive benefits and seamless access to
+              our chemical solutions and industrial resources.
             </p>
           </div>
 

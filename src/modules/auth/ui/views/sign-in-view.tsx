@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { SocialLogin } from "../components/social-login";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +19,7 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export const SignInView = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -29,16 +31,13 @@ export const SignInView = () => {
 
   const onSubmit = async (data: SignInFormValues) => {
     setIsLoading(true);
-    try {
-      const result = await signInAction(data);
-      if (result?.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Welcome back!");
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
-    } finally {
+    const result = await signInAction(data);
+    if (result?.success) {
+      toast.success("Welcome back!");
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      toast.error(result?.error || "Invalid email or password");
       setIsLoading(false);
     }
   };
@@ -63,8 +62,8 @@ export const SignInView = () => {
               Hi 👋 Welcome Back.
             </h1>
             <p className="hidden sm:block text-lg sm:text-xl opacity-90 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Enter your credentials to access your account and continue your journey
-              with Cisco Chemical solutions.
+              Enter your credentials to access your account and continue your
+              journey with Cisco Chemical solutions.
             </p>
           </div>
 

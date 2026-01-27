@@ -1,10 +1,10 @@
-import { CollectionConfig } from 'payload'
+import { CollectionConfig } from "payload";
 
 export const Orders: CollectionConfig = {
-  slug: 'orders',
+  slug: "orders",
   admin: {
-    useAsTitle: 'id',
-    defaultColumns: ['id', 'status', 'total', 'createdAt'],
+    useAsTitle: "id",
+    defaultColumns: ["id", "status", "total", "createdAt"],
   },
   access: {
     read: () => true,
@@ -12,43 +12,50 @@ export const Orders: CollectionConfig = {
   },
   fields: [
     {
-      name: 'status',
-      type: 'select',
-      defaultValue: 'pending',
+      name: "user",
+      type: "relationship",
+      relationTo: "users",
+      required: true,
+      index: true,
+    },
+    {
+      name: "status",
+      type: "select",
+      defaultValue: "pending",
       options: [
-        { label: 'Pending', value: 'pending' },
-        { label: 'Processing', value: 'processing' },
-        { label: 'Shipped', value: 'shipped' },
-        { label: 'Delivered', value: 'delivered' },
-        { label: 'Cancelled', value: 'cancelled' },
+        { label: "Pending", value: "pending" },
+        { label: "Processing", value: "processing" },
+        { label: "Shipped", value: "shipped" },
+        { label: "Delivered", value: "delivered" },
+        { label: "Cancelled", value: "cancelled" },
       ],
     },
     {
-      name: 'total',
-      type: 'number',
+      name: "total",
+      type: "number",
       required: true,
     },
     {
-      name: 'items',
-      type: 'array',
+      name: "items",
+      type: "array",
       fields: [
         {
-          name: 'product',
-          type: 'relationship',
-          relationTo: 'products',
+          name: "product",
+          type: "relationship",
+          relationTo: "products",
           required: true,
         },
         {
-          name: 'quantity',
-          type: 'number',
+          name: "quantity",
+          type: "number",
           required: true,
         },
         {
-          name: 'price',
-          type: 'number',
+          name: "price",
+          type: "number",
           required: true,
         },
       ],
     },
   ],
-}
+};

@@ -15,8 +15,7 @@ import { HomePage } from "./globals/HomePage";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const appURL =
-  process.env.NEXT_PUBLIC_APP_URL || "https://tazirishopbd.vercel.app";
+const appURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export default buildConfig({
   admin: {
     user: Users.slug,

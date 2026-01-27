@@ -6,7 +6,7 @@ import { Menu, User, Search, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { UserNav } from "@/modules/auth/ui/components/user-nav";
 import { getCurrentUser, signOutAction } from "@/modules/auth/actions";
 import { toast } from "sonner";
@@ -20,22 +20,25 @@ const navLinks = [
   { href: "/careers", label: "Careers" },
 ];
 
-export const Navbar = () => {
+interface NavbarProps {
+  user?: UserType | null;
+}
+
+export const Navbar = ({ user: initialUser }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [search] = useQueryState("q", { defaultValue: "" });
   const [inputValue, setInputValue] = useState(search);
-  const [user, setUser] = useState<UserType | null>(null);
+  const [user, setUser] = useState<UserType | null>(initialUser || null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser as UserType);
-    };
-    fetchUser();
-  }, []);
+    if (initialUser) {
+      setUser(initialUser);
+    }
+  }, [initialUser]);
 
   useEffect(() => {
     setInputValue(search);

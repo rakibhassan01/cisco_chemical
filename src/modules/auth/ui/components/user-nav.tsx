@@ -22,12 +22,8 @@ interface UserNavProps {
 
 export const UserNav = ({ user }: UserNavProps) => {
   const handleSignOut = async () => {
-    try {
-      await signOutAction();
-      toast.success("Signed out successfully");
-    } catch {
-      toast.error("Failed to sign out");
-    }
+    await signOutAction();
+    toast.success("Signed out successfully");
   };
 
   if (!user) {
@@ -86,7 +82,7 @@ export const UserNav = ({ user }: UserNavProps) => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/admin" className="cursor-pointer">
+          <Link href="/dashboard" className="cursor-pointer">
             <LayoutDashboard className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </Link>
