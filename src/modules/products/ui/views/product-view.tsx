@@ -1,10 +1,12 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useRef } from "react";
 import { useQueryState } from "nuqs";
 import { ChevronRight, Beaker, Search } from "lucide-react";
 import Image from "next/image";
-import { Product, Media, Category } from "@/payload-types";
+import Link from "next/link";
+import { Product, Category } from "@/payload-types";
 
 interface ProductsViewProps {
   initialProducts?: Product[];
@@ -22,16 +24,21 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
       typeof p.category === "object"
         ? (p.category as Category).name
         : "Uncategorized",
-    description: p.description,
+    description:
+      typeof p.description === "string"
+        ? p.description
+        : (p.description as any)?.root?.children?.[0]?.children?.[0]?.text ||
+          "Premium chemical solution",
     image:
-      (p.image as Media)?.url ||
+      (typeof p.mainImage === "object" ? p.mainImage.url : null) ||
       "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
+    price: p.price,
+    oldPrice: p.oldPrice,
+    stock: p.stock,
     icon: <Beaker className="w-6 h-6" />,
-    specs: p.specs?.map((s) => s.spec).filter((s): s is string => !!s) || [],
-    applications:
-      p.applications
-        ?.map((a) => a.application)
-        .filter((a): a is string => !!a) || [],
+    specs: [] as string[], // Specs are not in the current Product type, adding fallback
+    applications: [] as string[], // Applications are not in the current Product type, adding fallback
+    slug: p.slug,
   }));
 
   useEffect(() => {
@@ -182,10 +189,13 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                   </div>
 
                   {/* Action Button */}
-                  <button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center group-hover:shadow-lg shadow-green-500/25">
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center group-hover:shadow-lg shadow-green-500/25"
+                  >
                     <span>Learn More</span>
                     <ChevronRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

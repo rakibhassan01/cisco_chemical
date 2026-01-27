@@ -1,0 +1,65 @@
+/* Custom SCSS for Payload Admin Layout */
+
+// Move and style the Live Preview button to look like an icon-only button next to Save
+.doc-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  .live-preview-button {
+    // Basic styling
+    background: var(--theme-elevation-100) !important;
+    border: 1px solid var(--theme-elevation-200) !important;
+    border-radius: 4px !important;
+    padding: 10px !important;
+    min-width: unset !important;
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    order: -1; // Position it next to "Save" (adjust as needed)
+
+    // Hide text
+    span:not(.icon) {
+      display: none !important;
+    }
+
+    // Centering the icon
+    .icon {
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      
+      svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+    }
+
+    &:hover {
+      background: var(--theme-elevation-150) !important;
+    }
+  }
+}
+
+// Styling for potential Edit/API links in header
+.custom-header-links {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    
+    a {
+        color: var(--theme-text);
+        text-decoration: none;
+        opacity: 0.8;
+        
+        &:hover {
+            opacity: 1;
+        }
+    }
+}

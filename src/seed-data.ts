@@ -94,10 +94,30 @@ const seed = async () => {
           data: {
             name: product.name,
             category: category.id,
-            description: product.description,
-            specs: product.specs.map((s) => ({ spec: s })),
-            applications: product.applications.map((a) => ({ application: a })),
+            description: {
+              root: {
+                type: "root",
+                children: [
+                  {
+                    type: "paragraph",
+                    children: [
+                      {
+                        type: "text",
+                        text: product.description,
+                        version: 1,
+                      },
+                    ],
+                    version: 1,
+                  },
+                ],
+                direction: "ltr",
+                format: "left",
+                indent: 0,
+                version: 1,
+              },
+            },
           },
+          draft: true,
         });
         console.log(`Created product: ${product.name}`);
       } catch {
