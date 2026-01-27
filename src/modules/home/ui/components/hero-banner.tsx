@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { AnimatedCounter } from "./animated-counter";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Play, Beaker, Shield, Zap, Award } from "lucide-react";
+import { AnimatedCounter } from "./animated-counter";
 
 interface Slide {
   title: string;
@@ -12,6 +13,7 @@ interface Slide {
   description: string;
   image: string;
   accent: string;
+  bgGradient: string;
 }
 
 interface Stat {
@@ -20,21 +22,9 @@ interface Stat {
   label: string;
 }
 
-interface MousePosition {
-  x: number;
-  y: number;
-}
-
 const HeroBanner: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [mousePosition, setMousePosition] = useState<MousePosition>({
-    x: 0,
-    y: 0,
-  });
-  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
-  const [statsVisible, setStatsVisible] = useState<boolean>(false);
-  const statsRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const slides: Slide[] = [
     {
@@ -43,7 +33,8 @@ const HeroBanner: React.FC = () => {
       description:
         "Cutting-edge compounds that power industries with precision, reliability, and breakthrough performance.",
       image: "/images/hero-banner-1.png",
-      accent: "from-blue-600 to-cyan-500",
+      accent: "text-emerald-600",
+      bgGradient: "from-emerald-50 via-white to-teal-50",
     },
     {
       title: "Sustainable Chemistry",
@@ -51,7 +42,8 @@ const HeroBanner: React.FC = () => {
       description:
         "Eco-friendly processes that protect our planet while delivering exceptional efficiency and performance.",
       image: "/images/hero-banner-2.webp",
-      accent: "from-green-600 to-emerald-500",
+      accent: "text-green-600",
+      bgGradient: "from-green-50 via-white to-emerald-50",
     },
     {
       title: "Laboratory Excellence",
@@ -59,7 +51,8 @@ const HeroBanner: React.FC = () => {
       description:
         "World-class laboratories and rigorous quality control ensure the highest manufacturing standards.",
       image: "/images/hero-banner-3.jpg",
-      accent: "from-purple-600 to-indigo-500",
+      accent: "text-blue-600",
+      bgGradient: "from-blue-50 via-white to-cyan-50",
     },
   ];
 
@@ -70,529 +63,212 @@ const HeroBanner: React.FC = () => {
     { icon: Award, value: "200+", label: "Industry Awards" },
   ];
 
-  // Initial load animation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setHasLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Stats visibility observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStatsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (statsRef.current) {
-      observer.observe(statsRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
+    if (isHovered) return;
     const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentSlide((prev: number) => (prev + 1) % slides.length);
-        setIsTransitioning(false);
-      }, 300);
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 6000);
     return () => clearInterval(interval);
-  }, [slides.length]);
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({
-        x: (event.clientX / window.innerWidth) * 100,
-        y: (event.clientY / window.innerHeight) * 100,
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  const handleSlideChange = (index: number) => {
-    if (index !== currentSlide) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentSlide(index);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  };
+  }, [isHovered, slides.length]);
 
   return (
-    <>
-      <style jsx>{`
-        @keyframes bounce-once {
-          0%,
-          20%,
-          53%,
-          80%,
-          100% {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          40%,
-          43% {
-            transform: translate3d(0, -8px, 0) scale(1.05);
-          }
-          70% {
-            transform: translate3d(0, -4px, 0) scale(1.02);
-          }
-          90% {
-            transform: translate3d(0, -1px, 0) scale(1.01);
-          }
-        }
+    <section className="relative min-h-[90vh] lg:min-h-screen flex items-center overflow-hidden bg-white">
+      {/* Dynamic Background Gradient */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`bg-${currentSlide}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          className={`absolute inset-0 bg-gradient-to-br ${slides[currentSlide].bgGradient} opacity-40`}
+        />
+      </AnimatePresence>
 
-        .animate-bounce-once {
-          animation: bounce-once 0.6s ease-out;
-        }
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-3xl animate-pulse" />
+        <div
+          className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        />
 
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+        {/* Grid Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(#000 1px, transparent 1px)`,
+            backgroundSize: "32px 32px",
+          }}
+        />
+      </div>
 
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fadeInRight {
-          from {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-fade-in-up {
-          animation: fadeInUp 0.8s ease-out forwards;
-        }
-
-        .animate-fade-in-left {
-          animation: fadeInLeft 0.8s ease-out forwards;
-        }
-
-        .animate-fade-in-right {
-          animation: fadeInRight 0.8s ease-out forwards;
-        }
-
-        .animate-scale-in {
-          animation: scaleIn 0.8s ease-out forwards;
-        }
-
-        @media (max-width: 768px) {
-          .mobile-bg-fixed {
-            background-attachment: scroll;
-            background-position: center center;
-            background-size: cover;
-            background-repeat: no-repeat;
-          }
-        }
-      `}</style>
-
-      <section className="relative min-h-screen lg:min-h-screen md:min-h-[85vh] sm:min-h-[80vh] overflow-hidden">
-        {/* Dynamic Background Images - Improved Mobile Responsiveness */}
-        <div className="absolute inset-0">
-          {slides.map((slide, index) => (
-            <div
-              key={`bg-${index}`}
-              className={`absolute inset-0 transition-all duration-700 ease-in-out mobile-bg-fixed ${
-                currentSlide === index
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-105"
-              }`}
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div className="max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100 text-emerald-700 text-sm font-semibold mb-8"
             >
-              {/* Mobile optimized background */}
-              <div className="hidden md:block  absolute inset-0">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  className="object-cover object-center"
-                  sizes="100vw"
-                  priority={index === 0}
-                  style={{
-                    objectPosition: "center center",
-                  }}
-                />
-              </div>
+              <Zap className="w-4 h-4" />
+              <span>Leading Chemical Innovation</span>
+            </motion.div>
 
-              {/* Desktop background */}
-              <div className="hidden md:block">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  priority={index === 0}
-                />
-              </div>
-
-              {/* Dynamic Gradient Overlay - Enhanced for mobile */}
-              <div
-                className="absolute inset-0 transition-all duration-700"
-                style={{
-                  background: `linear-gradient(135deg, 
-                    rgba(0, 0, 0, 0.8) 0%, 
-                    rgba(0, 0, 0, 0.6) 30%, 
-                    rgba(0, 0, 0, 0.4) 70%, 
-                    rgba(0, 0, 0, 0.7) 100%
-                  )`,
-                }}
-              />
-
-              {/* Mobile specific overlay for better text readability */}
-              <div className="block md:hidden absolute inset-0 bg-black/30" />
-
-              {/* Accent Color Overlay */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${slide.accent} opacity-20 mix-blend-multiply transition-all duration-700`}
-              />
-            </div>
-          ))}
-
-          {/* Base Gradient Overlay for better readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
-        </div>
-
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Interactive Gradient Orb - Hidden on mobile for performance */}
-          <div
-            className={`hidden md:block absolute w-64 h-64 md:w-96 md:h-96 rounded-full bg-gradient-to-r from-white/10 to-white/5 blur-3xl transition-all duration-1000 ease-out ${
-              hasLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            style={{
-              left: `${mousePosition.x * 0.02}%`,
-              top: `${mousePosition.y * 0.02}%`,
-            }}
-          />
-
-          {/* Grid Pattern - Simplified on mobile */}
-          <div
-            className={`absolute inset-0 opacity-5 md:opacity-10 transition-opacity duration-1000 ${
-              hasLoaded ? "opacity-5 md:opacity-10" : "opacity-0"
-            }`}
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: "30px 30px",
-              transitionDelay: "0.5s",
-            }}
-          />
-          {/* Grid Pattern */}
-          {/* <div
-            className={`absolute inset-0 opacity-10 md:opacity-15 dark:opacity-15 md:dark:opacity-20 transition-opacity duration-1000 ${
-              hasLoaded
-                ? "opacity-10 md:opacity-15 dark:opacity-15 md:dark:opacity-20"
-                : "opacity-0"
-            }`}
-            style={{
-              backgroundImage: `
-      linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px)
-    `,
-              backgroundSize: "30px 30px",
-              transitionDelay: "0.5s",
-            }}
-          /> */}
-        </div>
-
-        {/* Main Content */}
-        <div className="relative z-10 lg:ml-10 mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-20 pb-8 sm:pb-12 lg:pb-16 min-h-screen flex items-center">
-          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center w-full">
-            {/* Left Content */}
-            <div
-              className={`space-y-4 sm:space-y-6 lg:space-y-8 text-white order-2 lg:order-1 text-center md:text-left ${
-                hasLoaded ? "animate-fade-in-left opacity-100" : "opacity-0"
-              }`}
-              style={{ animationDelay: "0.2s" }}
-            >
-              {/* Badge */}
-              <div
-                className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-medium ${
-                  hasLoaded ? "animate-scale-in opacity-100" : "opacity-0"
-                }`}
-                style={{ animationDelay: "0.4s" }}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`content-${currentSlide}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="space-y-6"
               >
-                <Zap className="w-4 h-4 text-green-400" />
-                <span className="hidden sm:inline">
-                  Leading Chemical Innovation
-                </span>
-                <span className="sm:hidden">Innovation Leader</span>
-              </div>
-
-              {/* Main Heading - Compact for mobile */}
-              <div className="space-y-2 sm:space-y-3 lg:space-y-4">
-                <h1
-                  className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-tight transform transition-all duration-500 ease-in-out ${
-                    isTransitioning
-                      ? "opacity-0 translate-y-4 scale-95"
-                      : "opacity-100 translate-y-0 scale-100"
-                  } ${
-                    hasLoaded ? "animate-fade-in-up opacity-100" : "opacity-0"
-                  }`}
-                  style={{ animationDelay: "0.6s" }}
-                >
-                  <span className="block text-white drop-shadow-lg">
-                    {slides[currentSlide].title
-                      .split(" ")
-                      .slice(0, -1)
-                      .join(" ")}
-                  </span>
-                  <span
-                    className={`block bg-gradient-to-r ${slides[currentSlide].accent} bg-clip-text text-transparent font-black transition-all duration-500 ease-in-out drop-shadow-lg`}
-                  >
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-900 leading-[1.1]">
+                  {slides[currentSlide].title.split(" ").slice(0, -1).join(" ")}{" "}
+                  <span className={`${slides[currentSlide].accent}`}>
                     {slides[currentSlide].title.split(" ").slice(-1)}
                   </span>
                 </h1>
-                <p
-                  className={`hidden md:block text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 font-light transform transition-all duration-500 ease-in-out delay-75 drop-shadow-md ${
-                    isTransitioning
-                      ? "opacity-0 translate-y-4"
-                      : "opacity-100 translate-y-0"
-                  } ${
-                    hasLoaded ? "animate-fade-in-up opacity-100" : "opacity-0"
-                  }`}
-                  style={{ animationDelay: "0.8s" }}
-                >
+
+                <p className="text-xl text-slate-600 font-medium leading-relaxed">
                   {slides[currentSlide].subtitle}
                 </p>
-              </div>
 
-              {/* Description - Hidden on mobile */}
-              <p
-                className={`hidden md:block text-base sm:text-lg text-white/80 leading-relaxed max-w-xl transform transition-all duration-500 ease-in-out delay-150 drop-shadow-sm ${
-                  isTransitioning
-                    ? "opacity-0 translate-y-4"
-                    : "opacity-100 translate-y-0"
-                } ${
-                  hasLoaded ? "animate-fade-in-up opacity-100" : "opacity-0"
-                }`}
-                style={{ animationDelay: "1s" }}
-              >
-                {slides[currentSlide].description}
-              </p>
+                <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
+                  {slides[currentSlide].description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
 
-              {/* CTA Buttons - Prominent on mobile */}
-              <div
-                className={`flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4 justify-center md:justify-start ${
-                  hasLoaded ? "animate-fade-in-up opacity-100" : "opacity-0"
-                }`}
-                style={{ animationDelay: "1.2s" }}
-              >
-                <Link
-                  href="/products"
-                  className="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-green-600 to-green-500 rounded-full text-white font-semibold text-base sm:text-lg hover:from-green-500 hover:to-green-400 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden w-full sm:w-auto no-underline min-h-[3.25rem] sm:min-h-[3.5rem]"
-                >
-                  <span className="relative z-10 inline-flex items-center justify-center gap-2 w-full">
-                    <span className="leading-none">Explore Products</span>
-                    <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300 flex-shrink-0" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </Link>
-                <button className="group flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 border-2 border-white/30 backdrop-blur-md rounded-full text-white font-semibold text-base sm:text-lg hover:border-green-400 hover:bg-green-400/20 transition-all duration-300 w-full sm:w-auto min-h-[3.25rem] sm:min-h-[3.5rem]">
-                  <div className="w-7 sm:w-8 md:w-10 h-7 sm:h-8 md:h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-green-400/30 transition-colors duration-300 flex-shrink-0">
-                    <Play className="w-3.5 sm:w-4 h-3.5 sm:h-4 ml-0.5" />
-                  </div>
-                  <span className="leading-none">Watch Demo</span>
-                </button>
-              </div>
-
-              {/* Stats - Compact grid on mobile */}
-              <div
-                ref={statsRef}
-                className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 pt-4 sm:pt-6 lg:pt-8 border-t border-white/20"
-              >
-                {stats.map((stat: Stat, index: number) => {
-                  const Icon = stat.icon;
-                  const hasPlus = stat.value.includes("+");
-                  const hasPercent = stat.value.includes("%");
-
-                  return (
-                    <div
-                      key={`stat-${index}`}
-                      className={`text-center group cursor-pointer transform transition-all duration-700 ease-out ${
-                        statsVisible
-                          ? "translate-y-0 opacity-100"
-                          : "translate-y-8 opacity-0"
-                      } ${
-                        hasLoaded
-                          ? "animate-fade-in-up opacity-100"
-                          : "opacity-0"
-                      }`}
-                      style={{
-                        transitionDelay: `${index * 150 + 200}ms`,
-                        animationDelay: `${index * 150 + 200}ms`,
-                      }}
-                    >
-                      <div
-                        className={`w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-1.5 sm:mb-2 lg:mb-3 group-hover:bg-white/20 transition-all duration-300 transform group-hover:scale-110 ${
-                          statsVisible ? "animate-bounce-once" : ""
-                        }`}
-                        style={{
-                          animationDelay: `${index * 200 + 600}ms`,
-                          animationDuration: "0.6s",
-                        }}
-                      >
-                        <Icon className="w-4 sm:w-5 lg:w-6 h-4 sm:h-5 lg:h-6 text-green-400" />
-                      </div>
-
-                      <div className="text-base sm:text-lg lg:text-2xl font-bold text-white drop-shadow-md">
-                        <AnimatedCounter
-                          endValue={stat.value}
-                          hasPlus={hasPlus}
-                          hasPercent={hasPercent}
-                          duration={2000}
-                        />
-                      </div>
-
-                      <div className="text-xs sm:text-sm text-white/70 drop-shadow-sm">
-                        {stat.label}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right Content - Simplified visual for mobile */}
-            <div
-              className={`relative order-1 lg:order-2 mb-6 lg:mb-0 ${
-                hasLoaded ? "animate-fade-in-right opacity-100" : "opacity-0"
-              }`}
-              style={{ animationDelay: "0.3s" }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-4 mt-10"
             >
-              {/* Main Visual Container - Smaller on mobile */}
-              <div className="relative aspect-square max-w-[220px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-[400px] mx-auto">
-                {/* Background Image Container */}
-                <div className="absolute inset-4 sm:inset-6 md:inset-8 lg:inset-12 rounded-full overflow-hidden border-2 sm:border-4 border-white/30 backdrop-blur-sm shadow-2xl">
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={slides[currentSlide].image}
-                      alt={slides[currentSlide].title}
-                      fill
-                      className={`object-cover transition-all duration-500 ease-in-out ${
-                        isTransitioning
-                          ? "opacity-0 scale-110"
-                          : "opacity-100 scale-100"
-                      }`}
-                      sizes="(max-width: 480px) 220px, (max-width: 640px) 280px, (max-width: 1024px) 320px, 400px"
-                      priority
-                    />
-                    {/* Image Overlay */}
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${slides[currentSlide].accent} opacity-30 transition-all duration-500`}
-                    />
-                  </div>
-                </div>
-
-                {/* Rotating Rings - Simplified on mobile */}
-                <div
-                  className={`absolute inset-0 animate-spin transition-opacity duration-1000 ${
-                    hasLoaded ? "opacity-60" : "opacity-0"
-                  }`}
-                  style={{
-                    animationDuration: "20s",
-                    transitionDelay: "0.5s",
-                  }}
-                >
-                  <div className="w-full h-full border border-white/30 rounded-full" />
-                </div>
-                <div
-                  className={`hidden sm:block absolute inset-3 sm:inset-4 animate-spin transition-opacity duration-1000 ${
-                    hasLoaded ? "opacity-40" : "opacity-0"
-                  }`}
-                  style={{
-                    animationDuration: "15s",
-                    animationDirection: "reverse",
-                    transitionDelay: "0.7s",
-                  }}
-                >
-                  <div className="w-full h-full border border-white/20 rounded-full border-dashed" />
-                </div>
-
-                {/* Central Logo Badge - Smaller on mobile */}
-                <div
-                  className={`absolute top-2 sm:top-4 left-1/2 transform -translate-x-1/2 bg-white/20 backdrop-blur-xl rounded-full px-2 sm:px-3 py-1.5 sm:py-2 border border-white/30 transition-all duration-1000 ${
-                    hasLoaded ? "scale-100 opacity-100" : "scale-75 opacity-0"
-                  }`}
-                  style={{ transitionDelay: "1.1s" }}
-                >
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-white">
-                    <Beaker className="w-3 sm:w-4 h-3 sm:h-4 text-green-400" />
-                    <div className="text-xs sm:text-sm font-bold">
-                      Cisco Chem
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Slide Indicators - Smaller on mobile */}
-              <div
-                className={`flex justify-center space-x-2 sm:space-x-3 mt-3 sm:mt-4 md:mt-6 transition-all duration-1000 ${
-                  hasLoaded
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-4 opacity-0"
-                }`}
-                style={{ transitionDelay: "1.5s" }}
+              <Link
+                href="/products"
+                className="group relative inline-flex items-center justify-center px-8 py-4 bg-emerald-600 rounded-xl text-white font-bold text-lg hover:bg-emerald-700 transition-all duration-300 shadow-xl shadow-emerald-200 hover:shadow-emerald-300 transform hover:-translate-y-1"
               >
-                {slides.map((_, index: number) => (
-                  <button
-                    key={`indicator-${index}`}
-                    onClick={() => handleSlideChange(index)}
-                    className={`w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
-                      currentSlide === index
-                        ? "bg-green-400 scale-125 shadow-lg shadow-green-400/50"
-                        : "bg-white/50 hover:bg-white/70 hover:scale-110"
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
+                Explore Products
+                <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <button className="inline-flex items-center justify-center px-8 py-4 bg-white rounded-xl text-slate-700 font-bold text-lg border-2 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all duration-300 group">
+                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-3 group-hover:bg-emerald-200 transition-colors">
+                  <Play className="w-4 h-4 text-emerald-600 fill-emerald-600 ml-0.5" />
+                </div>
+                Watch Demo
+              </button>
+            </motion.div>
+
+            {/* Stats Grid */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-8 mt-16 pt-10 border-t border-slate-100"
+            >
+              {stats.map((stat, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-600 mb-1">
+                    <stat.icon className="w-5 h-5" />
+                    <span className="text-2xl font-bold text-slate-900">
+                      <AnimatedCounter
+                        endValue={stat.value}
+                        hasPlus={stat.value.includes("+")}
+                        hasPercent={stat.value.includes("%")}
+                      />
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 font-medium">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Right Content - Visuals */}
+          <div
+            className="relative h-[400px] lg:h-[600px]"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`image-${currentSlide}`}
+                initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full h-full"
+              >
+                {/* Main Image Mask */}
+                <div className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-2xl shadow-emerald-200/50 border-[8px] border-white">
+                  <Image
+                    src={slides[currentSlide].image}
+                    alt={slides[currentSlide].title}
+                    fill
+                    className="object-cover"
+                    priority
                   />
-                ))}
-              </div>
+                  <div className="absolute inset-0 bg-emerald-900/10 mix-blend-overlay" />
+                </div>
+
+                {/* Floating Elements */}
+                <motion.div
+                  animate={{ y: [0, -20, 0] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute -top-6 -right-6 p-6 bg-white rounded-2xl shadow-xl border border-slate-50 z-20"
+                >
+                  <Beaker className="w-8 h-8 text-emerald-600" />
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [0, 20, 0] }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.5,
+                  }}
+                  className="absolute -bottom-6 -left-6 p-6 bg-white rounded-2xl shadow-xl border border-slate-50 z-20"
+                >
+                  <Award className="w-8 h-8 text-blue-600" />
+                </motion.div>
+
+                {/* Decorative Rings */}
+                <div className="absolute -inset-10 border border-emerald-100 rounded-full opacity-50 scale-75 animate-[spin_20s_linear_infinite]" />
+                <div className="absolute -inset-20 border border-blue-50 rounded-full opacity-30 scale-90 animate-[spin_30s_linear_infinite_reverse]" />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Slide Indicators */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === idx
+                      ? "w-8 bg-emerald-600"
+                      : "w-2 bg-slate-300 hover:bg-slate-400"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

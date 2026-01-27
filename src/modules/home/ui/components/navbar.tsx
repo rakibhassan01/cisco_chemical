@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Menu, User, Search, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,7 +20,13 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [search] = useQueryState("q", { defaultValue: "" });
+  const [inputValue, setInputValue] = useState(search);
+  const router = useRouter();
+
+  useEffect(() => {
+    setInputValue(search);
+  }, [search]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -45,19 +52,16 @@ export const Navbar = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      // Handle search logic here - redirect to search page or filter results
-      console.log("Searching for:", searchQuery);
-      // Example: router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    if (inputValue.trim()) {
+      router.push(`/products?q=${encodeURIComponent(inputValue.trim())}`);
       setIsSearchOpen(false);
-      setSearchQuery("");
     }
   };
 
   return (
     <header
-      className={`w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md fixed top-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? "shadow-lg bg-white/98 dark:bg-gray-900/98" : ""
+      className={`w-full border-b border-gray-200 bg-white/95 backdrop-blur-md fixed top-0 left-0 z-50 transition-all duration-300 ${
+        scrolled ? "shadow-lg bg-white/98" : ""
       }`}
     >
       {/* Main Navbar */}
@@ -65,7 +69,7 @@ export const Navbar = () => {
         {/* Logo - Left */}
         <Link
           href="/"
-          className="flex items-center space-x-2 text-xl sm:text-2xl font-bold text-black dark:text-white group flex-shrink-0 lg:ml-10"
+          className="flex items-center space-x-2 text-xl sm:text-2xl font-bold text-black group flex-shrink-0 lg:ml-10"
         >
           <div className="w-8 h-8 sm:w-10 sm:h-10 relative">
             <Image
@@ -76,7 +80,7 @@ export const Navbar = () => {
               priority
             />
           </div>
-          <span className="transition-colors duration-300 group-hover:text-green-600 dark:group-hover:text-green-400">
+          <span className="transition-colors duration-300 group-hover:text-green-600">
             Cisco Chem
           </span>
         </Link>
@@ -87,8 +91,8 @@ export const Navbar = () => {
             <Link
               key={href}
               href={href}
-              className="relative text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 py-2
-                after:content-[''] after:block after:h-[2px] after:bg-green-600 dark:after:bg-green-400 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left after:mt-1"
+              className="relative text-sm font-medium text-gray-600 hover:text-green-600 transition-all duration-300 py-2
+                after:content-[''] after:block after:h-[2px] after:bg-green-600 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left after:mt-1"
               style={{ transitionDelay: `${idx * 50}ms` }}
             >
               {label}
@@ -101,21 +105,16 @@ export const Navbar = () => {
           {/* Search Button - Desktop */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 hover:shadow-md"
+            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md"
           >
             <Search className="w-4 h-4" />
             <span className="text-sm hidden lg:inline">Search</span>
           </button>
 
-          {/* Theme Toggle - Desktop */}
-          <div className="hidden sm:block">
-            <ThemeToggle />
-          </div>
-
           {/* Login Button */}
           <Link
             href="/sign-in"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 dark:bg-green-700 text-white text-sm font-medium hover:bg-green-700 dark:hover:bg-green-600 transition-all duration-300 hover:shadow-md hover:scale-105"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-all duration-300 hover:shadow-md hover:scale-105"
           >
             <User className="w-4 h-4" />
             Login
@@ -126,25 +125,23 @@ export const Navbar = () => {
             {/* Search Button - Mobile */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
             >
-              <Search className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <Search className="h-5 w-5 text-gray-700" />
             </button>
 
-            {/* Theme Toggle - Mobile */}
-            <ThemeToggle />
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
-                <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <SheetTrigger className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                <Menu className="h-5 w-5 text-gray-700" />
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-full sm:w-80 bg-gradient-to-br from-white via-gray-50 to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-950/30 border-l border-gray-200/60 dark:border-gray-700/60 backdrop-blur-xl"
+                className="w-full sm:w-80 bg-gradient-to-br from-white via-gray-50 to-green-50/30 border-l border-gray-200/60 backdrop-blur-xl"
               >
                 {/* Mobile Header */}
-                <div className="flex items-center justify-center pb-8 border-b border-gray-200/60 dark:border-gray-700/60">
+                <div className="flex items-center justify-center pb-8 border-b border-gray-200/60">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 relative">
                       <Image
@@ -154,7 +151,7 @@ export const Navbar = () => {
                         className="object-contain rounded-lg"
                       />
                     </div>
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-2xl font-bold text-gray-900">
                       Cisco Chem
                     </span>
                   </div>
@@ -167,7 +164,7 @@ export const Navbar = () => {
                       key={href}
                       href={href}
                       onClick={() => setIsOpen(false)}
-                      className="relative block px-6 py-4 rounded-xl text-center text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 backdrop-blur-md transition-all duration-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-white/70 dark:hover:bg-gray-700/70 hover:border-green-400 dark:hover:border-green-500"
+                      className="relative block px-6 py-4 rounded-xl text-center text-gray-800 bg-white/50 border border-gray-300 backdrop-blur-md transition-all duration-300 hover:text-green-600 hover:bg-white/70 hover:border-green-400"
                       style={{
                         animation: `slideInFromRight 0.4s ease-out ${idx * 0.1}s both`,
                       }}
@@ -175,7 +172,7 @@ export const Navbar = () => {
                       <span className="text-base font-medium tracking-wide">
                         {label}
                       </span>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110" />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110" />
                     </Link>
                   ))}
 
@@ -183,7 +180,7 @@ export const Navbar = () => {
                   <Link
                     href="/sign-in"
                     onClick={() => setIsOpen(false)}
-                    className="block text-center mt-10 px-6 py-4 rounded-xl bg-green-600 dark:bg-green-700 text-white font-medium tracking-wide transition-all duration-300 hover:bg-green-700 dark:hover:bg-green-600"
+                    className="block text-center mt-10 px-6 py-4 rounded-xl bg-green-600 text-white font-medium tracking-wide transition-all duration-300 hover:bg-green-700"
                     style={{
                       animation: `slideInFromRight 0.4s ease-out ${navLinks.length * 0.1}s both`,
                     }}
@@ -196,7 +193,7 @@ export const Navbar = () => {
                 </nav>
 
                 {/* Decorative Footer */}
-                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-green-50/40 dark:from-green-950/40 to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-green-50/40 to-transparent pointer-events-none"></div>
               </SheetContent>
             </Sheet>
           </div>
@@ -207,23 +204,23 @@ export const Navbar = () => {
       {isSearchOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-start justify-center pt-20">
           <div className="w-full max-w-2xl mx-4">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
               {/* Search Header */}
-              <div className="flex items-center gap-4 p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-4 p-6 border-b border-gray-200">
                 <Search className="w-6 h-6 text-gray-400" />
                 <form onSubmit={handleSearch} className="flex-1">
                   <input
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
                     placeholder="Search products, chemicals, solutions..."
-                    className="w-full text-lg bg-transparent text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none"
+                    className="w-full text-lg bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none"
                     autoFocus
                   />
                 </form>
                 <button
                   onClick={() => setIsSearchOpen(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -232,7 +229,7 @@ export const Navbar = () => {
               {/* Search Suggestions */}
               <div className="p-6">
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                  <p className="text-sm text-gray-500 font-medium">
                     Quick Searches
                   </p>
                   {[
@@ -244,12 +241,12 @@ export const Navbar = () => {
                     <button
                       key={idx}
                       onClick={() => {
-                        setSearchQuery(suggestion);
-                        handleSearch({
-                          preventDefault: () => {},
-                        } as React.FormEvent);
+                        const val = suggestion;
+                        setInputValue(val);
+                        router.push(`/products?q=${encodeURIComponent(val)}`);
+                        setIsSearchOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors"
+                      className="block w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Search className="w-4 h-4 text-gray-400" />

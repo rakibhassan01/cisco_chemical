@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Search,
   MapPin,
@@ -47,7 +47,7 @@ const useIntersectionObserver = (options = {}) => {
     }
 
     return () => observer.disconnect();
-  }, [hasAnimated]);
+  }, [hasAnimated, options]);
 
   return [ref, isIntersecting] as const;
 };
@@ -88,12 +88,15 @@ export const CareersView = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
-  const [heroRef, heroInView] = useIntersectionObserver({ threshold: 0.1 });
-  const [statsRef, statsInView] = useIntersectionObserver({ threshold: 0.3 });
-  const [searchRef, searchInView] = useIntersectionObserver({ threshold: 0.2 });
-  const [benefitsRef, benefitsInView] = useIntersectionObserver({
-    threshold: 0.1,
-  });
+  const heroOptions = useMemo(() => ({ threshold: 0.1 }), []);
+  const statsOptions = useMemo(() => ({ threshold: 0.3 }), []);
+  const searchOptions = useMemo(() => ({ threshold: 0.2 }), []);
+  const benefitsOptions = useMemo(() => ({ threshold: 0.1 }), []);
+
+  const [heroRef, heroInView] = useIntersectionObserver(heroOptions);
+  const [statsRef, statsInView] = useIntersectionObserver(statsOptions);
+  const [searchRef, searchInView] = useIntersectionObserver(searchOptions);
+  const [benefitsRef, benefitsInView] = useIntersectionObserver(benefitsOptions);
 
   const jobs = [
     {
