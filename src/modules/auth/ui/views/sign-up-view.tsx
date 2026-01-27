@@ -2,15 +2,46 @@
 import { SocialLogin } from "../components/social-login";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { signUpAction } from "../../actions";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
+const signUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const SignUpView = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const onSubmit = async (data: SignUpFormValues) => {
+    setIsLoading(true);
+    try {
+      const result = await signUpAction(data);
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Account created successfully!");
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,9 +64,8 @@ export const SignUpView = () => {
               Hi 👋 Welcome to Cisco
             </h1>
             <p className="hidden sm:block text-lg sm:text-xl opacity-90 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Lorem Ipsum is placeholder text commonly used in the graphic,
-              print, and publishing industries for previewing layouts and visual
-              mockups
+              Join us to experience exclusive benefits and seamless access to our
+              chemical solutions and industrial resources.
             </p>
           </div>
 
@@ -51,7 +81,7 @@ export const SignUpView = () => {
                 </p>
               </div>
 
-              <div className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
                   <label
                     htmlFor="name"
@@ -60,14 +90,21 @@ export const SignUpView = () => {
                     Name
                   </label>
                   <input
+                    {...register("name")}
                     type="text"
                     id="name"
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
                     placeholder="Your name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors"
+                    className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors ${
+                      errors.name
+                        ? "border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
                   />
+                  {errors.name && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -78,13 +115,21 @@ export const SignUpView = () => {
                     Email
                   </label>
                   <input
+                    {...register("email")}
                     type="email"
                     id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="mail@gmail.com"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors"
+                    className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors ${
+                      errors.email
+                        ? "border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
                   />
+                  {errors.email && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -95,17 +140,28 @@ export const SignUpView = () => {
                     Password
                   </label>
                   <input
+                    {...register("password")}
                     type="password"
                     id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors"
+                    className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent outline-none transition-colors ${
+                      errors.password
+                        ? "border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
                   />
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm space-y-2 sm:space-y-0">
-                  <button className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors">
+                  <button
+                    type="button"
+                    className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors text-left"
+                  >
                     Forgot password?
                   </button>
                   <div className="text-gray-600 dark:text-gray-400">
@@ -120,9 +176,11 @@ export const SignUpView = () => {
                 </div>
 
                 <button
-                  onClick={handleSubmit}
-                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
+                  {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Sign Up
                 </button>
 
@@ -138,7 +196,7 @@ export const SignUpView = () => {
                 </div>
 
                 <SocialLogin />
-              </div>
+              </form>
             </div>
           </div>
         </div>

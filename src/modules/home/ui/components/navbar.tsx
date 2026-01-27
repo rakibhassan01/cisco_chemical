@@ -7,6 +7,10 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
+import { UserNav } from "@/modules/auth/ui/components/user-nav";
+import { getCurrentUser, signOutAction } from "@/modules/auth/actions";
+import { toast } from "sonner";
+import { User as UserType } from "@/payload-types";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -22,7 +26,16 @@ export const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [search] = useQueryState("q", { defaultValue: "" });
   const [inputValue, setInputValue] = useState(search);
+  const [user, setUser] = useState<UserType | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser as UserType);
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     setInputValue(search);
@@ -111,14 +124,10 @@ export const Navbar = () => {
             <span className="text-sm hidden lg:inline">Search</span>
           </button>
 
-          {/* Login Button */}
-          <Link
-            href="/sign-in"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-all duration-300 hover:shadow-md hover:scale-105"
-          >
-            <User className="w-4 h-4" />
-            Login
-          </Link>
+          {/* User Navigation (Login/Profile) */}
+          <div className="hidden sm:block">
+            <UserNav user={user} />
+          </div>
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 sm:hidden">
@@ -129,7 +138,6 @@ export const Navbar = () => {
             >
               <Search className="h-5 w-5 text-gray-700" />
             </button>
-
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -176,20 +184,52 @@ export const Navbar = () => {
                     </Link>
                   ))}
 
-                  {/* Mobile Login Button */}
-                  <Link
-                    href="/sign-in"
-                    onClick={() => setIsOpen(false)}
-                    className="block text-center mt-10 px-6 py-4 rounded-xl bg-green-600 text-white font-medium tracking-wide transition-all duration-300 hover:bg-green-700"
+                  {/* Mobile User Section */}
+                  <div
+                    className="pt-4"
                     style={{
                       animation: `slideInFromRight 0.4s ease-out ${navLinks.length * 0.1}s both`,
                     }}
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      <User className="w-5 h-5" />
-                      Login to Account
-                    </div>
-                  </Link>
+                    {!user ? (
+                      <Link
+                        href="/sign-in"
+                        onClick={() => setIsOpen(false)}
+                        className="block text-center px-6 py-4 rounded-xl bg-green-600 text-white font-medium tracking-wide transition-all duration-300 hover:bg-green-700"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <User className="w-5 h-5" />
+                          Login to Account
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="px-6 py-4 rounded-xl bg-green-50 border border-green-100 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
+                            {user.name?.[0]?.toUpperCase() || "U"}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-gray-900 leading-none">
+                              {user.name}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate max-w-[150px]">
+                              {user.email}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            await signOutAction();
+                            setIsOpen(false);
+                            toast.success("Signed out successfully");
+                          }}
+                          className="w-full text-center px-6 py-4 rounded-xl border border-red-200 text-red-600 font-medium tracking-wide transition-all duration-300 hover:bg-red-50"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </nav>
 
                 {/* Decorative Footer */}
