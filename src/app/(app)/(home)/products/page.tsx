@@ -1,26 +1,13 @@
 import { ProductsView } from "@/modules/products/ui/views/product-view";
-import configPromise from "@payload-config";
-import { getPayload } from "payload";
 import { Suspense } from "react";
-import { Product } from "@/payload-types";
 
-const Products = async () => {
-  const payload = await getPayload({
-    config: configPromise,
-  });
-
-  const { docs: products = [] } = await payload.find({
-    collection: "products",
-    depth: 1, // To get category details
-  });
-
-
+const Products = () => {
   return (
-    <div className="pt-18">
+    <div className="pt-20">
       <Suspense
-        fallback={<div className="min-h-screen animate-pulse bg-gray-50" />}
+        fallback={<div className="min-h-screen animate-pulse bg-slate-50" />}
       >
-        <ProductsView initialProducts={products as Product[]} />
+        <ProductsView />
       </Suspense>
     </div>
   );

@@ -1,0 +1,38 @@
+"use client";
+
+import { Product } from "@/payload-types";
+import { ProductCard } from "./product-card";
+import { useCart } from "@/hooks/use-cart";
+
+interface ProductGridProps {
+  products: Product[];
+}
+
+export function ProductGrid({ products }: ProductGridProps) {
+  const { addToCart } = useCart();
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onAddToCart={() =>
+              addToCart({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image:
+                  typeof product.mainImage === "object"
+                    ? product.mainImage.url || ""
+                    : "",
+                slug: product.slug,
+              })
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,6 @@
-import { ProductsView } from "@/modules/products/ui/views/product-view";
 import HeroBanner from "../components/hero-banner";
 import { ProductsHeader } from "@/modules/products/ui/components/products-header";
+import { ProductGrid } from "@/modules/products/ui/components/product-grid";
 import { CTA } from "@/modules/products/ui/components/CTA";
 import { Product } from "@/payload-types";
 
@@ -12,8 +12,10 @@ export const HomeView = ({ products = [] }: HomeViewProps) => {
   return (
     <>
       <HeroBanner />
-      <ProductsHeader />
-      <ProductsView initialProducts={products} />
+      <div className="pt-20">
+        <ProductsHeader />
+        <ProductGrid products={products} />
+      </div>
       <CTA />
     </>
   );
