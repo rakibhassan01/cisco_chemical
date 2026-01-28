@@ -136,6 +136,20 @@ export interface User {
   id: string;
   name: string;
   avatar?: (string | null) | Media;
+  /**
+   * Items in the user's cart
+   */
+  cart?:
+    | {
+        product: string | Product;
+        quantity: number;
+        name?: string | null;
+        price?: number | null;
+        image?: string | null;
+        slug?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -172,16 +186,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  name: string;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -223,6 +227,16 @@ export interface Product {
    * Auto-generated from name, but can be edited.
    */
   slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -339,6 +353,17 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   avatar?: T;
+  cart?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        name?: T;
+        price?: T;
+        image?: T;
+        slug?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;

@@ -153,3 +153,52 @@ export async function updateUserAction(data: {
     return { error: "Failed to update profile" };
   }
 }
+
+export async function getCartAction() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const fullUser = await payload.findByID({
+      collection: "users",
+      id: user.id,
+    });
+    return fullUser.cart || [];
+  } catch (error) {
+    console.error("getCartAction error:", error);
+    return null;
+  }
+}
+
+export async function syncCartAction(cartItems: { id: string; quantity: number; name: string; price: number; image: string; slug: string }[]) {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Not authenticated" };
+
+  try {
+    const payload = await getPayload({ config: configPromise });
+
+    // Format items for Payload array
+    const formattedCart = cartItems.map((item) => ({
+      product: item.id,
+      quantity: item.quantity,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      slug: item.slug,
+    }));
+
+    await payload.update({
+      collection: "users",
+      id: user.id,
+      data: {
+        cart: formattedCart,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("syncCartAction error:", error);
+    return { error: "Failed to sync cart" };
+  }
+}
