@@ -11,13 +11,16 @@ import {
   X, 
   Pencil, 
   Terminal, 
-  ShoppingCart 
+  ShoppingCart,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { createQuoteAction } from "../../actions";
+import { getCurrentUser } from "@/modules/auth/actions";
 
 interface ProductDetailViewProps {
   initialProduct: Product;
@@ -29,6 +32,7 @@ export const ProductDetailView = ({
   serverURL,
 }: ProductDetailViewProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(true);
+  const [isSubmittingQuote, setIsSubmittingQuote] = useState(false);
   const { addToCart } = useCart();
   const router = useRouter();
   const effectiveServerURL =
@@ -182,14 +186,44 @@ export const ProductDetailView = ({
             <div className="pt-8 border-t border-gray-100 space-y-4">
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={() => {
-                    toast.info(`Quote request for ${product.name} has been initiated. Our team will contact you shortly regarding bulk pricing.`);
-                    router.push("/contact");
+                  disabled={isSubmittingQuote}
+                  onClick={async () => {
+                    setIsSubmittingQuote(true);
+                    try {
+                      const user = await getCurrentUser();
+                      if (!user) {
+                        toast.error("Please sign in to request a quote");
+                        router.push("/sign-in");
+                        return;
+                      }
+
+                      const res = await createQuoteAction({
+                        userId: user.id,
+                        productId: product.id,
+                        note: `Bulk quote request for ${product.name}`,
+                      });
+
+                      if (res.success) {
+                        toast.success("Quote request submitted! Admin will set the price shortly.");
+                        router.push("/orders"); // Or a new /quotes page if we create one
+                      } else {
+                        toast.error(res.error || "Failed to submit quote");
+                      }
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Something went wrong");
+                    } finally {
+                      setIsSubmittingQuote(false);
+                    }
                   }}
-                  className="flex-1 min-w-[200px] bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 hover:bg-slate-800 shadow-slate-900/10"
+                  className="flex-1 min-w-[200px] bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 hover:bg-slate-800 shadow-slate-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Terminal className="w-5 h-5" />
-                  Request Quote (Bulk)
+                  {isSubmittingQuote ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Terminal className="w-5 h-5" />
+                  )}
+                  {isSubmittingQuote ? "Submitting..." : "Request Quote (Bulk)"}
                 </button>
               </div>
 

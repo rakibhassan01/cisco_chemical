@@ -103,3 +103,31 @@ export async function getCategoriesAction() {
     return [];
   }
 }
+
+export async function createQuoteAction(data: {
+  userId: string | number;
+  productId: string | number;
+  note?: string;
+}) {
+  const payload = await getPayload({ config: configPromise });
+  try {
+    const quote = await payload.create({
+      collection: "quotes",
+      data: {
+        user: Number(data.userId),
+        items: [
+          {
+            product: Number(data.productId),
+            quantity: 1, // Default to 1 for now, can be expanded
+          },
+        ],
+        note: data.note,
+        status: "pending",
+      },
+    });
+    return { success: true, quote };
+  } catch (error) {
+    console.error("Error creating quote:", error);
+    return { error: "Failed to create quote request" };
+  }
+}

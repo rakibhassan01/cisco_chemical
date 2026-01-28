@@ -10,6 +10,7 @@ import { Media } from "./collections/Media";
 import { Products } from "./collections/Products";
 import { Categories } from "./collections/Categories";
 import { Orders } from "./collections/Orders";
+import { Quotes } from "./collections/Quotes";
 import { SiteSettings } from "./globals/SiteSettings";
 import { HomePage } from "./globals/HomePage";
 
@@ -42,7 +43,7 @@ export default buildConfig({
       url: ({ data }) => `${appURL}/products/${data.slug}`,
     },
   },
-  collections: [Users, Media, Categories, Products, Orders],
+  collections: [Users, Media, Categories, Products, Orders, Quotes],
   globals: [SiteSettings, HomePage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
