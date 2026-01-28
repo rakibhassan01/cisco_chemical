@@ -44,5 +44,5 @@ export default async function OrdersPage() {
     console.error("OrdersPage: Error fetching data:", error);
   }
 
-  return <OrdersView orders={orders} quotes={quotes} />;
+  return <OrdersView orders={orders} quotes={quotes} user={user} />;
 }

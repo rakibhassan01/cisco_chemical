@@ -6,12 +6,18 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { DownloadInvoice } from "../components/download-invoice";
+
 interface OrdersViewProps {
   orders: OrderType[];
   quotes: QuoteType[];
+  user: {
+    name?: string | null;
+    email: string;
+  };
 }
 
-export const OrdersView = ({ orders, quotes }: OrdersViewProps) => {
+export const OrdersView = ({ orders, quotes, user }: OrdersViewProps) => {
   const [activeTab, setActiveTab] = useState<"orders" | "quotes">("orders");
 
   const getOrderStatusColor = (status: OrderType["status"]) => {
@@ -150,9 +156,12 @@ export const OrdersView = ({ orders, quotes }: OrdersViewProps) => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
-                            <ChevronRight className="w-5 h-5" />
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <DownloadInvoice order={order} user={user} />
+                            <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
+                              <ChevronRight className="w-5 h-5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
