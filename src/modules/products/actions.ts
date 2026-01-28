@@ -29,6 +29,7 @@ export async function getFilteredProductsAction(params: GetProductsParams) {
 
   const payload = await getPayload({ config: configPromise });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {};
 
   if (query) {
@@ -42,10 +43,16 @@ export async function getFilteredProductsAction(params: GetProductsParams) {
     where.category = { equals: category };
   }
 
-  if (minPrice !== undefined && minPrice > 0 || maxPrice !== undefined && maxPrice < 10000) {
-    where.price = {};
-    if (minPrice !== undefined && minPrice > 0) where.price.greater_than_equal = minPrice;
-    if (maxPrice !== undefined && maxPrice < 10000) where.price.less_than_equal = maxPrice;
+  if (
+    (minPrice !== undefined && minPrice > 0) ||
+    (maxPrice !== undefined && maxPrice < 10000)
+  ) {
+    const priceFilter: Record<string, number> = {};
+    if (minPrice !== undefined && minPrice > 0)
+      priceFilter.greater_than_equal = minPrice;
+    if (maxPrice !== undefined && maxPrice < 10000)
+      priceFilter.less_than_equal = maxPrice;
+    where.price = priceFilter;
   }
 
   if (inStock) {

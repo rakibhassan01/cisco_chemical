@@ -32,7 +32,7 @@ interface ProductsViewProps {
   initialProducts?: Product[];
 }
 
-const EMPTY_ARRAY: any[] = [];
+const EMPTY_ARRAY: Product[] = [];
 
 export function ProductsView({
   initialProducts = EMPTY_ARRAY,
@@ -113,7 +113,6 @@ export function ProductsView({
       });
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     fetchProducts,
     initialProducts,
@@ -248,13 +247,17 @@ export function ProductsView({
                 {data.products.map((product) => (
                   <ProductCard
                     key={product.id}
-                    product={product as any}
+                    product={product}
                     onAddToCart={() =>
                       addToCart({
-                        id: product.id,
+                        id: String(product.id),
                         name: product.name,
                         price: product.price,
-                        image: (product.mainImage as any)?.url || "",
+                        image:
+                          typeof product.mainImage === "object" &&
+                          product.mainImage !== null
+                            ? (product.mainImage as { url?: string }).url || ""
+                            : "",
                         slug: product.slug || "",
                       })
                     }

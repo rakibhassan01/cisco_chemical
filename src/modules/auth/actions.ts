@@ -35,7 +35,7 @@ export async function signUpAction(data: {
         password: data.password,
         name: data.name,
       },
-    });
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // After sign up, log them in
     const result = await payload.login({
@@ -144,7 +144,7 @@ export async function updateUserAction(data: {
       data: {
         ...data,
       },
-    });
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     revalidatePath("/", "layout");
     return { success: true, user: updatedUser };
@@ -180,7 +180,7 @@ export async function syncCartAction(cartItems: { id: string; quantity: number; 
 
     // Format items for Payload array
     const formattedCart = cartItems.map((item) => ({
-      product: item.id,
+      product: Number(item.id),
       quantity: item.quantity,
       name: item.name,
       price: item.price,
@@ -194,7 +194,7 @@ export async function syncCartAction(cartItems: { id: string; quantity: number; 
       data: {
         cart: formattedCart,
       },
-    });
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     return { success: true };
   } catch (error) {

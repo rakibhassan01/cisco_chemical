@@ -20,14 +20,15 @@ export function ProductGrid({ products }: ProductGridProps) {
             product={product}
             onAddToCart={() =>
               addToCart({
-                id: product.id,
+                id: String(product.id),
                 name: product.name,
                 price: product.price,
                 image:
-                  typeof product.mainImage === "object"
-                    ? product.mainImage.url || ""
+                  typeof product.mainImage === "object" &&
+                  product.mainImage !== null
+                    ? (product.mainImage as { url?: string }).url || ""
                     : "",
-                slug: product.slug,
+                slug: product.slug || "",
               })
             }
           />

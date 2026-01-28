@@ -35,12 +35,14 @@ export const ProductDetailView = ({
   if (!product) return null;
 
   const categoryName =
-    typeof product.category === "object"
+    typeof product.category === "object" && product.category !== null
       ? (product.category as Category).name
       : "Uncategorized";
 
   const imageUrl =
-    (typeof product.mainImage === "object" ? product.mainImage.url : null) ||
+    (typeof product.mainImage === "object" && product.mainImage !== null
+      ? (product.mainImage as { url?: string }).url
+      : null) ||
     "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop";
 
   const price = product.price;
@@ -174,7 +176,7 @@ export const ProductDetailView = ({
                 onClick={() => {
                   if (stock > 0) {
                     addToCart({
-                      id: product.id,
+                      id: String(product.id),
                       name: product.name,
                       price: product.price,
                       image: imageUrl,
@@ -196,7 +198,7 @@ export const ProductDetailView = ({
                 onClick={() => {
                   if (stock > 0) {
                     addToCart({
-                      id: product.id,
+                      id: String(product.id),
                       name: product.name,
                       price: product.price,
                       image: imageUrl,
@@ -250,7 +252,7 @@ export const ProductDetailView = ({
             {/* Links */}
             <div className="flex flex-col p-2 space-y-1">
               <a
-                href={`/admin/collections/products/${product.id}`}
+                href={`/admin/collections/products/${String(product.id)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors group cursor-pointer"
@@ -272,7 +274,7 @@ export const ProductDetailView = ({
               </div>
 
               <a
-                href={`/api/products/${product.id}`}
+                href={`/api/products/${String(product.id)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors group cursor-pointer"

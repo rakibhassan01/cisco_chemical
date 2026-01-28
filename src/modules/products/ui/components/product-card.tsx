@@ -13,8 +13,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const router = useRouter();
-  const image = typeof product.mainImage === 'object' ? product.mainImage.url : null;
-  const categoryName = typeof product.category === 'object' ? product.category.name : 'Chemical';
+  const image = typeof product.mainImage === "object" && product.mainImage !== null
+    ? (product.mainImage as { url?: string }).url
+    : null;
+  const categoryName = typeof product.category === "object" && product.category !== null
+    ? (product.category as { name: string }).name
+    : "Chemical";
 
   return (
     <div className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden flex flex-col h-full">

@@ -92,7 +92,7 @@ export const OrdersView = ({ orders }: OrdersViewProps) => {
                     >
                       <td className="px-6 py-4">
                         <span className="font-mono text-sm font-medium text-gray-900">
-                          #{order.id.slice(-8).toUpperCase()}
+                          #{String(order.id).slice(-8).toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4">

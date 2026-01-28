@@ -66,10 +66,10 @@ export function ProductFilters({
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => onCategoryChange(cat.id)}
+              onClick={() => onCategoryChange(String(cat.id))}
               className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                selectedCategory === cat.id 
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200" 
+                selectedCategory === String(cat.id)
+                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200"
                   : "text-slate-600 hover:bg-slate-50"
               }`}
             >
@@ -93,7 +93,7 @@ export function ProductFilters({
             max={10000}
             step={100}
             value={[priceRange[0], priceRange[1]]}
-            onValueChange={(val: any) => onPriceChange(val as [number, number])}
+            onValueChange={(val) => onPriceChange(val as [number, number])}
             className="my-6"
           />
         </div>

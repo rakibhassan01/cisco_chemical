@@ -255,7 +255,7 @@ export const DashboardView = ({ user, orders }: DashboardViewProps) => {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">
-                            Order #{order.id.slice(-8).toUpperCase()}
+                            Order #{String(order.id).slice(-8).toUpperCase()}
                           </p>
                           <p className="text-xs text-gray-500">
                             {new Date(order.createdAt).toLocaleDateString()}

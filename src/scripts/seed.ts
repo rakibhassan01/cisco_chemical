@@ -61,7 +61,7 @@ const seed = async () => {
         });
         mediaItems.push(media);
         console.log(`Created media: ${file.name}`);
-      } catch (err) {
+      } catch {
         console.warn(`Could not create media ${file.name}, skipping image...`);
       }
     }
@@ -155,7 +155,7 @@ const seed = async () => {
           price: product.price,
           stock: product.stock,
           mainImage: imageId,
-          description: product.description as any,
+          description: product.description as any, // eslint-disable-line @typescript-eslint/no-explicit-any
           slug: product.name
             .toLowerCase()
             .replace(/ /g, "-")

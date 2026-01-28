@@ -43,11 +43,14 @@ export const useCart = () => {
         if (dbCart && dbCart.length > 0) {
           // Merge local items into DB cart if they exist
           const mergedItems: CartItem[] = [
-            ...dbCart.map((item: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
-              id:
-                typeof item.product === "object"
-                  ? (item.product as any).id // eslint-disable-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...dbCart.map((item: Record<string, any>) => ({
+              id: String(
+                typeof item.product === "object" && item.product !== null
+                  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (item.product as Record<string, any>).id
                   : item.product,
+              ),
               quantity: item.quantity,
               name: item.name || "",
               price: item.price || 0,
@@ -58,24 +61,52 @@ export const useCart = () => {
 
           if (localItems.length > 0) {
             localItems.forEach((localItem) => {
+              const localId = String(localItem.id);
               const existingIndex = mergedItems.findIndex(
-                (item) => item.id === localItem.id,
+                (item) => String(item.id) === localId,
               );
               if (existingIndex > -1) {
                 mergedItems[existingIndex].quantity += localItem.quantity;
               } else {
-                mergedItems.push(localItem);
+                mergedItems.push({
+                  ...localItem,
+                  id: localId,
+                });
               }
             });
             // Sync merged result back to DB
             await syncCartAction(mergedItems);
             localStorage.removeItem(CART_STORAGE_KEY);
           }
-          setItems(mergedItems);
+
+          // Final deduplication safety pass
+          const uniqueItems: CartItem[] = [];
+          mergedItems.forEach((item) => {
+            const existing = uniqueItems.find((u) => u.id === item.id);
+            if (existing) {
+              existing.quantity += item.quantity;
+            } else {
+              uniqueItems.push(item);
+            }
+          });
+
+          setItems(uniqueItems);
         } else if (localItems.length > 0) {
           // No DB cart but has local items -> sync local to DB
-          await syncCartAction(localItems);
-          setItems(localItems);
+          // Deduplicate localItems too just in case
+          const uniqueLocal: CartItem[] = [];
+          localItems.forEach((item) => {
+            const id = String(item.id);
+            const existing = uniqueLocal.find((u) => u.id === id);
+            if (existing) {
+              existing.quantity += item.quantity;
+            } else {
+              uniqueLocal.push({ ...item, id });
+            }
+          });
+
+          await syncCartAction(uniqueLocal);
+          setItems(uniqueLocal);
           localStorage.removeItem(CART_STORAGE_KEY);
         } else {
           setItems([]);
