@@ -6,11 +6,13 @@ import { Menu, User, Search, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { UserNav } from "@/modules/auth/ui/components/user-nav";
-import { getCurrentUser, signOutAction } from "@/modules/auth/actions";
+import { signOutAction } from "@/modules/auth/actions";
 import { toast } from "sonner";
 import { User as UserType } from "@/payload-types";
+import { useCart } from "@/hooks/use-cart";
+import { ShoppingCart } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -31,8 +33,8 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
   const [search] = useQueryState("q", { defaultValue: "" });
   const [inputValue, setInputValue] = useState(search);
   const [user, setUser] = useState<UserType | null>(initialUser || null);
+  const { count } = useCart();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (initialUser) {
@@ -127,6 +129,20 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
             <span className="text-sm hidden lg:inline">Search</span>
           </button>
 
+          {/* Cart Button - Desktop */}
+          <Link
+            href="/cart"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md relative"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            <span className="text-sm hidden lg:inline">Cart</span>
+            {count > 0 && (
+              <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                {count}
+              </span>
+            )}
+          </Link>
+
           {/* User Navigation (Login/Profile) */}
           <div className="hidden sm:block">
             <UserNav user={user} />
@@ -139,8 +155,21 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
               onClick={() => setIsSearchOpen(true)}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
             >
-              <Search className="h-5 w-5 text-gray-700" />
+            <Search className="h-5 w-5 text-gray-700" />
             </button>
+            
+            {/* Cart Button - Mobile */}
+            <Link
+              href="/cart"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative"
+            >
+              <ShoppingCart className="h-5 w-5 text-gray-700" />
+              {count > 0 && (
+                <span className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                  {count}
+                </span>
+              )}
+            </Link>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>

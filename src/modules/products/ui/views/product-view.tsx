@@ -3,10 +3,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useQueryState } from "nuqs";
-import { ChevronRight, Beaker, Search } from "lucide-react";
+import { Beaker, Search } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { Product, Category } from "@/payload-types";
+import { useCart } from "@/hooks/use-cart";
+import { ShoppingCart, CreditCard } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ProductsViewProps {
   initialProducts?: Product[];
@@ -16,6 +18,8 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
   const [visibleItems, setVisibleItems] = useState(new Set<string>());
   const [search] = useQueryState("q", { defaultValue: "" });
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const { addToCart } = useCart();
+  const router = useRouter();
 
   const products = (initialProducts || []).map((p) => ({
     id: p.id,
@@ -188,14 +192,30 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                     </div>
                   </div>
 
-                  {/* Action Button */}
-                  <Link
-                    href={`/products/${product.slug}`}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center group-hover:shadow-lg shadow-green-500/25"
-                  >
-                    <span>Learn More</span>
-                    <ChevronRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
-                  </Link>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        addToCart(product);
+                      }}
+                      className="w-full bg-emerald-50 text-emerald-700 py-3 rounded-xl font-semibold hover:bg-emerald-100 transition-all duration-300 flex items-center justify-center border border-emerald-200"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      <span>Add to Cart</span>
+                    </button>
+                    <button
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        addToCart(product);
+                        router.push("/cart");
+                      }}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center shadow-lg shadow-green-500/25 active:scale-[0.98]"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      <span>Buy Now</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

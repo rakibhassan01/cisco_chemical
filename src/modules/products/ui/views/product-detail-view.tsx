@@ -7,6 +7,9 @@ import Image from "next/image";
 import { Beaker, ChevronLeft, Eye, X, Pencil, Terminal } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useCart } from "@/hooks/use-cart";
+import { useRouter } from "next/navigation";
+import { ShoppingCart, CreditCard } from "lucide-react";
 
 interface ProductDetailViewProps {
   initialProduct: Product;
@@ -18,6 +21,8 @@ export const ProductDetailView = ({
   serverURL,
 }: ProductDetailViewProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(true);
+  const { addToCart } = useCart();
+  const router = useRouter();
   const effectiveServerURL =
     serverURL || process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
@@ -166,16 +171,49 @@ export const ProductDetailView = ({
 
             <div className="pt-8 border-t border-gray-100 flex flex-wrap gap-4">
               <button
-                className={`flex-1 min-w-[200px] text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 ${
+                onClick={() => {
+                  if (stock > 0) {
+                    addToCart({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: imageUrl,
+                      slug: product.slug,
+                    });
+                  }
+                }}
+                disabled={stock <= 0}
+                className={`flex-1 min-w-[200px] text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
                   stock > 0
-                    ? "bg-green-600 hover:bg-green-700 shadow-green-600/20"
+                    ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
+                <ShoppingCart className="w-5 h-5" />
                 {stock > 0 ? "Add to Cart" : "Out of Stock"}
               </button>
-              <button className="flex-1 min-w-[200px] bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 px-8 py-4 rounded-xl font-bold transition-all active:scale-95">
-                Technical Datasheet (TDS)
+              <button
+                onClick={() => {
+                  if (stock > 0) {
+                    addToCart({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: imageUrl,
+                      slug: product.slug,
+                    });
+                    router.push("/cart");
+                  }
+                }}
+                disabled={stock <= 0}
+                className={`flex-1 min-w-[200px] px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
+                  stock > 0
+                    ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
+                }`}
+              >
+                <CreditCard className="w-5 h-5" />
+                {stock > 0 ? "Buy Now" : "Unavailable"}
               </button>
             </div>
           </div>
