@@ -62,12 +62,21 @@ export const OrdersView = ({ orders, quotes, user }: OrdersViewProps) => {
               Manage your orders and bulk quote requests
             </p>
           </div>
-          <Link
-            href="/products"
-            className="inline-flex items-center justify-center px-6 py-2.5 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-all shadow-sm"
-          >
-            New Order
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/quick-order"
+              className="inline-flex items-center justify-center px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95 text-sm gap-2"
+            >
+              <Calculator className="w-4 h-4" />
+              Quick Order (Bulk)
+            </Link>
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all shadow-sm text-sm"
+            >
+              New Single Order
+            </Link>
+          </div>
         </div>
 
         {/* Tabs */}

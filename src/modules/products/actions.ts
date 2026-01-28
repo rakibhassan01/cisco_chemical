@@ -108,6 +108,7 @@ export async function createQuoteAction(data: {
   userId: string | number;
   productId: string | number;
   note?: string;
+  quantity?: number;
 }) {
   const payload = await getPayload({ config: configPromise });
   try {
@@ -118,7 +119,7 @@ export async function createQuoteAction(data: {
         items: [
           {
             product: Number(data.productId),
-            quantity: 1, // Default to 1 for now, can be expanded
+            quantity: data.quantity || 1,
           },
         ],
         note: data.note,
@@ -129,5 +130,31 @@ export async function createQuoteAction(data: {
   } catch (error) {
     console.error("Error creating quote:", error);
     return { error: "Failed to create quote request" };
+  }
+}
+
+export async function createBulkQuoteAction(data: {
+  userId: string | number;
+  items: { productId: string | number; quantity: number }[];
+  note?: string;
+}) {
+  const payload = await getPayload({ config: configPromise });
+  try {
+    const quote = await payload.create({
+      collection: "quotes",
+      data: {
+        user: Number(data.userId),
+        items: data.items.map((item) => ({
+          product: Number(item.productId),
+          quantity: item.quantity,
+        })),
+        note: data.note,
+        status: "pending",
+      },
+    });
+    return { success: true, quote };
+  } catch (error) {
+    console.error("Error creating bulk quote:", error);
+    return { error: "Failed to submit bulk quote request" };
   }
 }
