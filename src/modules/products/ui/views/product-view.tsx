@@ -1,22 +1,22 @@
 "use client";
 
-
 import { useState, useEffect, useCallback } from "react";
 import { useQueryState, parseAsInteger, parseAsBoolean } from "nuqs";
-import { 
-  Search, 
-} from "lucide-react";
+import { Search } from "lucide-react";
 import { Product, Category } from "@/payload-types";
 import { useCart } from "@/hooks/use-cart";
-import { getFilteredProductsAction, getCategoriesAction } from "@/modules/products/actions";
+import {
+  getFilteredProductsAction,
+  getCategoriesAction,
+} from "@/modules/products/actions";
 import { ProductFilters } from "../components/product-filters";
 import { ProductCard } from "../components/product-card";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import {
@@ -32,15 +32,30 @@ interface ProductsViewProps {
   initialProducts?: Product[];
 }
 
-export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
+const EMPTY_ARRAY: any[] = [];
+
+export function ProductsView({
+  initialProducts = EMPTY_ARRAY,
+}: ProductsViewProps) {
   const { addToCart } = useCart();
 
   // Query State
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
-  const [category, setCategory] = useQueryState("category", { defaultValue: "all" });
-  const [minPrice, setMinPrice] = useQueryState("min", parseAsInteger.withDefault(0));
-  const [maxPrice, setMaxPrice] = useQueryState("max", parseAsInteger.withDefault(10000));
-  const [inStock, setInStock] = useQueryState("stock", parseAsBoolean.withDefault(false));
+  const [category, setCategory] = useQueryState("category", {
+    defaultValue: "all",
+  });
+  const [minPrice, setMinPrice] = useQueryState(
+    "min",
+    parseAsInteger.withDefault(0),
+  );
+  const [maxPrice, setMaxPrice] = useQueryState(
+    "max",
+    parseAsInteger.withDefault(10000),
+  );
+  const [inStock, setInStock] = useQueryState(
+    "stock",
+    parseAsBoolean.withDefault(false),
+  );
   const [sort, setSort] = useQueryState("sort", { defaultValue: "-createdAt" });
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 
@@ -50,10 +65,10 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
     products: Product[];
     totalDocs: number;
     totalPages: number;
-  }>({ 
-    products: initialProducts, 
-    totalDocs: initialProducts.length, 
-    totalPages: Math.ceil(initialProducts.length / 9) || 1
+  }>({
+    products: initialProducts,
+    totalDocs: initialProducts.length,
+    totalPages: Math.ceil(initialProducts.length / 9) || 1,
   });
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -67,29 +82,48 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
       inStock,
       sort,
       page,
-      limit: 9
+      limit: 9,
     });
     setData({
       products: result.products,
       totalDocs: result.totalDocs,
-      totalPages: result.totalPages
+      totalPages: result.totalPages,
     });
     setLoading(false);
   }, [search, category, minPrice, maxPrice, inStock, sort, page]);
 
   useEffect(() => {
-    const hasActiveFilters = search || category !== "all" || minPrice > 0 || maxPrice < 10000 || inStock || page > 1;
-    if (hasActiveFilters || initialProducts.length === 0) {
+    // Check if we have any active filters
+    const hasActiveFilters =
+      (search && search !== "") ||
+      category !== "all" ||
+      minPrice > 0 ||
+      maxPrice < 10000 ||
+      inStock ||
+      page > 1;
+
+    // Fetch if we have no initial products OR if filters are active
+    if (initialProducts.length === 0 || hasActiveFilters) {
       fetchProducts();
     } else {
       setData({
         products: initialProducts,
         totalDocs: initialProducts.length,
-        totalPages: Math.ceil(initialProducts.length / 9) || 1
+        totalPages: Math.ceil(initialProducts.length / 9) || 1,
       });
       setLoading(false);
     }
-  }, [fetchProducts, initialProducts, search, category, minPrice, maxPrice, inStock, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    fetchProducts,
+    initialProducts,
+    search,
+    category,
+    minPrice,
+    maxPrice,
+    inStock,
+    page,
+  ]);
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -101,25 +135,34 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    window.scrollTo({ top: 300, behavior: 'smooth' });
+    window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
         <div className="flex flex-col lg:flex-row gap-12">
-          
           {/* Sidebar Filters */}
           <aside className="lg:w-80 w-full shrink-0">
             <div className="sticky top-28">
               <ProductFilters
                 categories={categories}
                 selectedCategory={category}
-                onCategoryChange={(val) => { setCategory(val); setPage(1); }}
+                onCategoryChange={(val) => {
+                  setCategory(val);
+                  setPage(1);
+                }}
                 priceRange={[minPrice, maxPrice]}
-                onPriceChange={(range) => { setMinPrice(range[0]); setMaxPrice(range[1]); setPage(1); }}
+                onPriceChange={(range) => {
+                  setMinPrice(range[0]);
+                  setMaxPrice(range[1]);
+                  setPage(1);
+                }}
                 inStock={inStock}
-                onInStockChange={(val) => { setInStock(val); setPage(1); }}
+                onInStockChange={(val) => {
+                  setInStock(val);
+                  setPage(1);
+                }}
                 onReset={() => {
                   setCategory("all");
                   setMinPrice(0);
@@ -142,7 +185,10 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                   type="text"
                   placeholder="Search products..."
                   value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-2xl border-none text-xs font-black focus:ring-2 focus:ring-emerald-500 transition-all uppercase tracking-wider"
                 />
               </div>
@@ -157,10 +203,30 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-slate-100">
-                    <SelectItem value="-createdAt" className="font-black text-[10px] uppercase tracking-widest">Newest First</SelectItem>
-                    <SelectItem value="price" className="font-black text-[10px] uppercase tracking-widest">Price: Low to High</SelectItem>
-                    <SelectItem value="-price" className="font-black text-[10px] uppercase tracking-widest">Price: High to Low</SelectItem>
-                    <SelectItem value="name" className="font-black text-[10px] uppercase tracking-widest">Name: A to Z</SelectItem>
+                    <SelectItem
+                      value="-createdAt"
+                      className="font-black text-[10px] uppercase tracking-widest"
+                    >
+                      Newest First
+                    </SelectItem>
+                    <SelectItem
+                      value="price"
+                      className="font-black text-[10px] uppercase tracking-widest"
+                    >
+                      Price: Low to High
+                    </SelectItem>
+                    <SelectItem
+                      value="-price"
+                      className="font-black text-[10px] uppercase tracking-widest"
+                    >
+                      Price: High to Low
+                    </SelectItem>
+                    <SelectItem
+                      value="name"
+                      className="font-black text-[10px] uppercase tracking-widest"
+                    >
+                      Name: A to Z
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -180,28 +246,32 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
             ) : data.products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {data.products.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    onAddToCart={() => addToCart({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      image: typeof product.mainImage === 'object' ? product.mainImage.url || "" : "",
-                      slug: product.slug
-                    })} 
+                  <ProductCard
+                    key={product.id}
+                    product={product as any}
+                    onAddToCart={() =>
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: (product.mainImage as any)?.url || "",
+                        slug: product.slug || "",
+                      })
+                    }
                   />
                 ))}
               </div>
             ) : (
-              <NoResults onClear={() => {
-                setSearch("");
-                setCategory("all");
-                setMinPrice(0);
-                setMaxPrice(10000);
-                setInStock(false);
-                setPage(1);
-              }} />
+              <NoResults
+                onClear={() => {
+                  setSearch("");
+                  setCategory("all");
+                  setMinPrice(0);
+                  setMaxPrice(10000);
+                  setInStock(false);
+                  setPage(1);
+                }}
+              />
             )}
 
             {/* Pagination */}
@@ -210,12 +280,12 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
+                      <PaginationPrevious
                         onClick={() => page > 1 && handlePageChange(page - 1)}
-                        className={`cursor-pointer ${page === 1 ? 'opacity-50 pointer-events-none' : ''}`}
+                        className={`cursor-pointer ${page === 1 ? "opacity-50 pointer-events-none" : ""}`}
                       />
                     </PaginationItem>
-                    
+
                     {[...Array(data.totalPages)].map((_, i) => {
                       const p = i + 1;
                       return (
@@ -232,9 +302,11 @@ export function ProductsView({ initialProducts = [] }: ProductsViewProps) {
                     })}
 
                     <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => page < data.totalPages && handlePageChange(page + 1)}
-                        className={`cursor-pointer ${page === data.totalPages ? 'opacity-50 pointer-events-none' : ''}`}
+                      <PaginationNext
+                        onClick={() =>
+                          page < data.totalPages && handlePageChange(page + 1)
+                        }
+                        className={`cursor-pointer ${page === data.totalPages ? "opacity-50 pointer-events-none" : ""}`}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -254,9 +326,13 @@ function NoResults({ onClear }: { onClear: () => void }) {
       <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center shadow-xl mb-6">
         <Search className="w-10 h-10 text-slate-200" />
       </div>
-      <h3 className="text-2xl font-black text-slate-900 mb-2">No matches found</h3>
-      <p className="text-slate-500 font-medium mb-8">Try adjusting your filters or search terms</p>
-      <button 
+      <h3 className="text-2xl font-black text-slate-900 mb-2">
+        No matches found
+      </h3>
+      <p className="text-slate-500 font-medium mb-8">
+        Try adjusting your filters or search terms
+      </p>
+      <button
         onClick={onClear}
         className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-emerald-200 active:scale-95 transition-all uppercase tracking-widest"
       >

@@ -1,12 +1,18 @@
+import { Button } from "@/components/ui/button";
+import { Chrome } from "lucide-react";
+
 export const SocialLogin = () => {
   return (
-    <>
-      <button
+    <div className="w-full">
+      <Button
+        variant="outline"
+        className="w-full h-14 rounded-2xl border-slate-100 bg-white hover:bg-slate-50 font-black text-xs uppercase tracking-[0.2em] text-slate-700 transition-all shadow-sm flex items-center justify-center gap-3"
+        type="button"
         // onClick={() => signInWithGoogle()}
-        className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
       >
-        Continue With google
-      </button>
-    </>
+        <Chrome className="w-4 h-4 text-emerald-600" />
+        Continue with Google
+      </Button>
+    </div>
   );
 };

@@ -1,13 +1,51 @@
 "use client";
 
 import { useCart } from "@/hooks/use-cart";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 
 export const CartView = () => {
-  const { items, removeFromCart, updateQuantity, total, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, total, clearCart, isLoaded } = useCart();
+
+  if (!isLoaded) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <Skeleton className="w-24 h-24 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/4" />
+                </div>
+                <Skeleton className="h-10 w-32" />
+              </div>
+            ))}
+          </div>
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 sticky top-24 space-y-6">
+              <Skeleton className="h-7 w-32" />
+              <div className="space-y-4">
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+              <Skeleton className="h-14 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

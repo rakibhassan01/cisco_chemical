@@ -90,7 +90,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
@@ -133,15 +133,16 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   name: string;
-  avatar?: (string | null) | Media;
+  avatar?: (number | null) | Media;
+  role: 'admin' | 'user';
   /**
    * Items in the user's cart
    */
   cart?:
     | {
-        product: string | Product;
+        product: number | Product;
         quantity: number;
         name?: string | null;
         price?: number | null;
@@ -173,7 +174,7 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -192,19 +193,19 @@ export interface Media {
  * via the `definition` "products".
  */
 export interface Product {
-  id: string;
+  id: number;
   name: string;
-  category: string | Category;
+  category: number | Category;
   stock: number;
   price: number;
   /**
    * যে দামটি কাটা অবস্থায় থাকবে।
    */
   oldPrice?: number | null;
-  mainImage: string | Media;
+  mainImage: number | Media;
   gallery?:
     | {
-        image: string | Media;
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
@@ -235,7 +236,7 @@ export interface Product {
  * via the `definition` "categories".
  */
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   updatedAt: string;
   createdAt: string;
@@ -245,13 +246,13 @@ export interface Category {
  * via the `definition` "orders".
  */
 export interface Order {
-  id: string;
-  user: string | User;
+  id: number;
+  user: number | User;
   status?: ('pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') | null;
   total: number;
   items?:
     | {
-        product: string | Product;
+        product: number | Product;
         quantity: number;
         price: number;
         id?: string | null;
@@ -265,7 +266,7 @@ export interface Order {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -282,32 +283,32 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'categories';
-        value: string | Category;
+        value: number | Category;
       } | null)
     | ({
         relationTo: 'products';
-        value: string | Product;
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'orders';
-        value: string | Order;
+        value: number | Order;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -317,10 +318,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -340,7 +341,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -353,6 +354,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   avatar?: T;
+  role?: T;
   cart?:
     | T
     | {
@@ -494,9 +496,9 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
-  id: string;
+  id: number;
   siteName: string;
-  logo?: (string | null) | Media;
+  logo?: (number | null) | Media;
   contactEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -506,10 +508,10 @@ export interface SiteSetting {
  * via the `definition` "home-page".
  */
 export interface HomePage {
-  id: string;
+  id: number;
   heroTitle: string;
   heroSubtitle?: string | null;
-  featuredProducts?: (string | Product)[] | null;
+  featuredProducts?: (number | Product)[] | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
