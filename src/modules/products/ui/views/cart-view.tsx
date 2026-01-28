@@ -5,7 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { toast } from "sonner";
 
 export const CartView = () => {
   const { items, removeFromCart, updateQuantity, total, clearCart, isLoaded } = useCart();
@@ -171,16 +170,13 @@ export const CartView = () => {
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                // In a real app, this would lead to checkout
-                toast.success("Order functionality coming soon!");
-              }}
+            <Link
+              href="/checkout"
               className="w-full bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition-all shadow-lg shadow-green-600/20 active:scale-[0.98]"
             >
               Checkout Now
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
 
             <p className="mt-4 text-center text-xs text-gray-400">
               Secure payment processing by Cisco Chemical

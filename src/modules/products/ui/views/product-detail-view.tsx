@@ -4,12 +4,20 @@
 import { useLivePreview } from "@payloadcms/live-preview-react";
 import { Product, Category } from "@/payload-types";
 import Image from "next/image";
-import { Beaker, ChevronLeft, Eye, X, Pencil, Terminal } from "lucide-react";
+import { 
+  Beaker, 
+  ChevronLeft, 
+  Eye, 
+  X, 
+  Pencil, 
+  Terminal, 
+  ShoppingCart 
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 interface ProductDetailViewProps {
   initialProduct: Product;
@@ -171,52 +179,46 @@ export const ProductDetailView = ({
               )}
             </div>
 
-            <div className="pt-8 border-t border-gray-100 flex flex-wrap gap-4">
-              <button
-                onClick={() => {
-                  if (stock > 0) {
+            <div className="pt-8 border-t border-gray-100 space-y-4">
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => {
+                    toast.info(`Quote request for ${product.name} has been initiated. Our team will contact you shortly regarding bulk pricing.`);
+                    router.push("/contact");
+                  }}
+                  className="flex-1 min-w-[200px] bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 hover:bg-slate-800 shadow-slate-900/10"
+                >
+                  <Terminal className="w-5 h-5" />
+                  Request Quote (Bulk)
+                </button>
+              </div>
+
+              <div className="bg-green-50/50 border border-green-100 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center gap-3 text-green-700">
+                  <Beaker className="w-5 h-5" />
+                  <span className="text-sm font-bold uppercase tracking-wider">Lab Testing Sample</span>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Need to test the molecular purity? Order a 1-2 KG Lab Sample before committing to a commercial contract.
+                </p>
+                <button
+                  onClick={() => {
                     addToCart({
-                      id: String(product.id),
-                      name: product.name,
-                      price: product.price,
+                      id: `${product.id}-sample`,
+                      name: `${product.name} (Lab Sample)`,
+                      price: 50,
                       image: imageUrl,
                       slug: product.slug,
+                      isSample: true,
                     });
-                  }
-                }}
-                disabled={stock <= 0}
-                className={`flex-1 min-w-[200px] text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
-                  stock > 0
-                    ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {stock > 0 ? "Add to Cart" : "Out of Stock"}
-              </button>
-              <button
-                onClick={() => {
-                  if (stock > 0) {
-                    addToCart({
-                      id: String(product.id),
-                      name: product.name,
-                      price: product.price,
-                      image: imageUrl,
-                      slug: product.slug,
-                    });
-                    router.push("/cart");
-                  }
-                }}
-                disabled={stock <= 0}
-                className={`flex-1 min-w-[200px] px-8 py-4 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
-                  stock > 0
-                    ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
-                }`}
-              >
-                <CreditCard className="w-5 h-5" />
-                {stock > 0 ? "Buy Now" : "Unavailable"}
-              </button>
+                    toast.success("Lab Sample added to cart!");
+                  }}
+                  className="w-full bg-white text-green-600 border-2 border-green-600 px-8 py-3 rounded-xl font-bold transition-all hover:bg-green-600 hover:text-white active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  Order Lab Sample ($50)
+                </button>
+              </div>
             </div>
           </div>
         </div>

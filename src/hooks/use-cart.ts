@@ -7,6 +7,7 @@ import {
   getCartAction,
   syncCartAction,
 } from "@/modules/auth/actions";
+import { User } from "@/payload-types";
 
 export interface CartItem {
   id: string;
@@ -15,6 +16,7 @@ export interface CartItem {
   quantity: number;
   image: string;
   slug: string;
+  isSample?: boolean;
 }
 
 const CART_STORAGE_KEY = "cisco_chem_cart";
@@ -23,7 +25,7 @@ const CART_UPDATE_EVENT = "cart-update";
 export const useCart = () => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [user, setUser] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [user, setUser] = useState<User | null>(null);
   const isSyncing = useRef(false);
 
   // Load user and sync with DB if needed
@@ -42,21 +44,36 @@ export const useCart = () => {
 
         if (dbCart && dbCart.length > 0) {
           // Merge local items into DB cart if they exist
+          interface PayloadCartItem {
+            product: string | number | { id: string | number };
+            quantity: number;
+            name?: string | null;
+            price?: number | null;
+            image?: string | null;
+            slug?: string | null;
+            isSample?: boolean | null;
+          }
+
           const mergedItems: CartItem[] = [
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...dbCart.map((item: Record<string, any>) => ({
-              id: String(
-                typeof item.product === "object" && item.product !== null
-                  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (item.product as Record<string, any>).id
-                  : item.product,
-              ),
-              quantity: item.quantity,
-              name: item.name || "",
-              price: item.price || 0,
-              image: item.image || "",
-              slug: item.slug || "",
-            })),
+            ...(dbCart as PayloadCartItem[]).map((itemValue) => {
+              const productId = String(
+                typeof itemValue.product === "object" && itemValue.product !== null
+                  ? itemValue.product.id
+                  : itemValue.product,
+              );
+              
+              const itemId = itemValue.isSample ? `${productId}-sample` : productId;
+              
+              return {
+                id: itemId,
+                quantity: itemValue.quantity || 1,
+                name: itemValue.name || "",
+                price: itemValue.price || 0,
+                image: itemValue.image || "",
+                slug: itemValue.slug || "",
+                isSample: itemValue.isSample || false,
+              };
+            }),
           ];
 
           if (localItems.length > 0) {
@@ -185,6 +202,7 @@ export const useCart = () => {
       price: number;
       image: string;
       slug?: string | null;
+      isSample?: boolean;
     },
     quantity: number = 1,
   ) => {
@@ -205,6 +223,7 @@ export const useCart = () => {
         quantity: quantity,
         image: product.image,
         slug: product.slug || "",
+        isSample: product.isSample || false,
       };
       newItems = [...items, newItem];
     }

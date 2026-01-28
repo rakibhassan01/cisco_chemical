@@ -148,6 +148,7 @@ export interface User {
         price?: number | null;
         image?: string | null;
         slug?: string | null;
+        isSample?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -364,6 +365,7 @@ export interface UsersSelect<T extends boolean = true> {
         price?: T;
         image?: T;
         slug?: T;
+        isSample?: T;
         id?: T;
       };
   updatedAt?: T;

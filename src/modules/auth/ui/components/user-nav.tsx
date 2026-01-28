@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { User, LogOut, Settings, LayoutDashboard, Package } from "lucide-react";
 import Link from "next/link";
 import { signOutAction } from "../../actions";
 import { toast } from "sonner";
@@ -85,6 +85,12 @@ export const UserNav = ({ user }: UserNavProps) => {
           <Link href="/dashboard" className="cursor-pointer">
             <LayoutDashboard className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/orders" className="cursor-pointer">
+            <Package className="mr-2 h-4 w-4" />
+            <span>My Orders</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

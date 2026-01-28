@@ -171,7 +171,7 @@ export async function getCartAction() {
   }
 }
 
-export async function syncCartAction(cartItems: { id: string; quantity: number; name: string; price: number; image: string; slug: string }[]) {
+export async function syncCartAction(cartItems: { id: string; quantity: number; name: string; price: number; image: string; slug: string; isSample?: boolean }[]) {
   const user = await getCurrentUser();
   if (!user) return { error: "Not authenticated" };
 
@@ -179,14 +179,22 @@ export async function syncCartAction(cartItems: { id: string; quantity: number; 
     const payload = await getPayload({ config: configPromise });
 
     // Format items for Payload array
-    const formattedCart = cartItems.map((item) => ({
-      product: Number(item.id),
-      quantity: item.quantity,
-      name: item.name,
-      price: item.price,
-      image: item.image,
-      slug: item.slug,
-    }));
+    const formattedCart = cartItems.map((item) => {
+      // Extract numeric ID from "ID-sample" if present
+      const baseId = item.id.includes("-sample") 
+        ? Number(item.id.replace("-sample", "")) 
+        : Number(item.id);
+        
+      return {
+        product: baseId,
+        quantity: item.quantity,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        slug: item.slug,
+        isSample: item.id.includes("-sample") || item.isSample || false,
+      };
+    });
 
     await payload.update({
       collection: "users",

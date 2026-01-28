@@ -30,6 +30,13 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: "- Cisco Chemical",
+      icons: [
+        {
+          rel: "icon",
+          type: "image/x-icon",
+          url: "/favicon.ico",
+        },
+      ],
     },
     livePreview: {
       url: ({ data }) => `${appURL}/products/${data.slug}`,

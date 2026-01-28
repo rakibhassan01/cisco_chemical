@@ -93,6 +93,11 @@ export const Users: CollectionConfig = {
           name: "slug",
           type: "text",
         },
+        {
+          name: "isSample",
+          type: "checkbox",
+          defaultValue: false,
+        },
       ],
     },
   ],

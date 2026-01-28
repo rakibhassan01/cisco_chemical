@@ -1,0 +1,229 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useCart } from "@/hooks/use-cart";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { createPaymentIntentAction, createOrderAction } from "@/modules/checkout/actions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+// Initialize Stripe outside component to avoid re-creation
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+const CheckoutForm = ({ total }: { total: number }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isLoading, setIsLoading] = useState(false);
+  const { items, clearCart } = useCart();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      redirect: "if_required",
+    });
+
+    if (error) {
+      toast.error(error.message || "An unexpected error occurred.");
+      setIsLoading(false);
+    } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      try {
+        // Record the order in Payload CMS
+        await createOrderAction(items, total);
+        toast.success("Payment successful!");
+        clearCart();
+        router.push("/checkout/success");
+      } catch (err) {
+        console.error("Error finalizing order:", err);
+        toast.error("Payment succeeded but order creation failed. Please contact support.");
+        // We still redirect to success because the user has paid
+        router.push("/checkout/success");
+      }
+    } else {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <PaymentElement options={{ layout: "tabs" }} />
+      
+      <Button 
+        type="submit" 
+        disabled={isLoading || !stripe || !elements} 
+        className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 transition-all shadow-lg hover:shadow-green-600/30"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          `Pay $${total.toLocaleString()}`
+        )}
+      </Button>
+      
+      <p className="text-xs text-center text-gray-500 flex items-center justify-center gap-1.5">
+        <Lock className="w-3 h-3" />
+        Payments are secure and encrypted
+      </p>
+    </form>
+  );
+};
+
+export const CheckoutView = () => {
+  const { items, total, isLoaded } = useCart();
+  const [clientSecret, setClientSecret] = useState("");
+
+  useEffect(() => {
+    if (items.length > 0) {
+      createPaymentIntentAction(total)
+        .then((data) => {
+            if(data.clientSecret)
+             setClientSecret(data.clientSecret)
+        })
+        .catch((err) => {
+          console.error("Payment init error:", err);
+          toast.error("Failed to initialize payment");
+        });
+    }
+  }, [items, total]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-green-600" />
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex flex-col items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center p-8">
+            <CardContent className="space-y-6 pt-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600">
+                    <CheckCircle2 className="w-10 h-10" />
+                </div>
+                <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-gray-900">Cart is Empty</h2>
+                    <p className="text-gray-500">Add some products to proceed with checkout.</p>
+                </div>
+                <Button asChild className="w-full bg-green-600 hover:bg-green-700">
+                    <Link href="/products">Browse Products</Link>
+                </Button>
+            </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+            <Link href="/cart" className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back to Cart
+            </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Order Summary */}
+          <div className="space-y-6 lg:order-2">
+            <Card className="border-0 shadow-xl overflow-hidden">
+              <CardHeader className="bg-gray-900 text-white p-6">
+                <CardTitle className="text-xl">Order Summary</CardTitle>
+                <CardDescription className="text-gray-300">Review your items before payment</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="max-h-[400px] overflow-y-auto p-6 space-y-6">
+                    {items.map((item) => (
+                    <div key={item.id} className="flex gap-4">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
+                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm text-gray-900 truncate">{item.name}</h4>
+                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        </div>
+                        <p className="font-bold text-sm text-gray-900">${(item.price * item.quantity).toLocaleString()}</p>
+                    </div>
+                    ))}
+                </div>
+                <Separator />
+                <div className="p-6 space-y-3 bg-gray-50/50">
+                    <div className="flex justify-between text-sm text-gray-600">
+                        <span>Subtotal</span>
+                        <span>${total.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                        <span>Shipping</span>
+                        <span className="text-green-600 font-medium">Free</span>
+                    </div>
+                    <Separator className="bg-gray-200" />
+                    <div className="flex justify-between text-lg font-bold text-gray-900">
+                        <span>Total to Pay</span>
+                        <span>${total.toLocaleString()}</span>
+                    </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="hidden lg:flex items-center justify-center gap-2 text-sm text-gray-400">
+                <Lock className="w-4 h-4" />
+                <span>Encrypted and Secure Payment</span>
+            </div>
+          </div>
+
+          {/* Payment Form */}
+          <div className="lg:order-1">
+             <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Checkout</h1>
+                <p className="text-gray-500">Complete your purchase securely.</p>
+             </div>
+
+            <Card className="border-gray-200 shadow-sm">
+                <CardHeader>
+                    <CardTitle>Payment Details</CardTitle>
+                    <CardDescription>Enter your payment method below.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {clientSecret ? (
+                    <Elements options={{ clientSecret, appearance: { theme: 'stripe' } }} stripe={stripePromise}>
+                        <CheckoutForm total={total} />
+                    </Elements>
+                    ) : (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+                        <p className="text-sm text-gray-500">Initializing secure checkout...</p>
+                    </div>
+                    )}
+                </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -139,8 +139,10 @@ export const CartSidebar = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-12 rounded-xl text-base shadow-lg shadow-green-600/20">
-                  Checkout Now <ArrowRight className="w-4 h-4 ml-2" />
+                <Button asChild className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-12 rounded-xl text-base shadow-lg shadow-green-600/20">
+                  <Link href="/checkout" onClick={() => setIsOpen(false)}>
+                    Checkout Now <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
                 </Button>
                 <SheetTrigger asChild>
                   <Link 
