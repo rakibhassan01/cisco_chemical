@@ -111,19 +111,28 @@ export const CartView = () => {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
+                <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50 overflow-hidden">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="p-2 hover:text-green-600 transition-colors"
+                    className="p-2 hover:bg-gray-100 hover:text-green-600 transition-colors"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-8 text-center font-medium text-gray-900">
-                    {item.quantity}
-                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value > 0) {
+                        updateQuantity(item.id, value);
+                      }
+                    }}
+                    className="w-12 h-full text-center font-medium text-gray-900 bg-transparent border-x border-gray-200 focus:outline-none appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="p-2 hover:text-green-600 transition-colors"
+                    className="p-2 hover:bg-gray-100 hover:text-green-600 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                   </button>

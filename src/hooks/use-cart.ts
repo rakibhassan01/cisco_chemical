@@ -143,8 +143,40 @@ export const useCart = () => {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(newItems));
     }
 
-    window.dispatchEvent(new Event(CART_UPDATE_EVENT));
+    // Dispatch custom event with the new items to update other components immediately
+    window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT, { detail: newItems }));
   };
+
+  // Listen for cart updates from other instances/tabs
+  useEffect(() => {
+    const handleCartUpdate = (e: Event) => {
+      // If this is a custom event from the same window, use the payload directly
+      if (e instanceof CustomEvent && e.detail) {
+        setItems(e.detail);
+        return;
+      }
+
+      // Fallback: Read from storage (for multi-tab sync)
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) {
+        try {
+          const parsedItems = JSON.parse(savedCart);
+          setItems(parsedItems);
+        } catch {
+          // ignore error
+        }
+      }
+    };
+
+    window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+    // Also listen for storage events (multi-tab sync)
+    window.addEventListener("storage", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+      window.removeEventListener("storage", handleCartUpdate);
+    };
+  }, []);
 
   const addToCart = (
     product: {

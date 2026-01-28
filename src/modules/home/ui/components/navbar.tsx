@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { User as UserType } from "@/payload-types";
 import { useCart } from "@/hooks/use-cart";
 import { ShoppingCart } from "lucide-react";
+import { CartSidebar } from "./cart-sidebar";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -130,18 +131,19 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
           </button>
 
           {/* Cart Button - Desktop */}
-          <Link
-            href="/cart"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md relative"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span className="text-sm hidden lg:inline">Cart</span>
-            {count > 0 && (
-              <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
-                {count}
-              </span>
-            )}
-          </Link>
+          <CartSidebar>
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md relative"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span className="text-sm hidden lg:inline">Cart</span>
+              {count > 0 && (
+                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                  {count}
+                </span>
+              )}
+            </button>
+          </CartSidebar>
 
           {/* User Navigation (Login/Profile) */}
           <div className="hidden sm:block">
@@ -159,17 +161,18 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
             </button>
             
             {/* Cart Button - Mobile */}
-            <Link
-              href="/cart"
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative"
-            >
-              <ShoppingCart className="h-5 w-5 text-gray-700" />
-              {count > 0 && (
-                <span className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                  {count}
-                </span>
-              )}
-            </Link>
+            <CartSidebar>
+              <button
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative"
+              >
+                <ShoppingCart className="h-5 w-5 text-gray-700" />
+                {count > 0 && (
+                  <span className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                    {count}
+                  </span>
+                )}
+              </button>
+            </CartSidebar>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
