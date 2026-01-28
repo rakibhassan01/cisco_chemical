@@ -22,6 +22,15 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      graphics: {
+        Logo: "/components/payload/Logo",
+        Icon: "/components/payload/Icon",
+      },
+    },
+    meta: {
+      titleSuffix: "- Cisco Chemical",
+    },
     livePreview: {
       url: ({ data }) => `${appURL}/products/${data.slug}`,
     },
