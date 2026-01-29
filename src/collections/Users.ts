@@ -51,6 +51,7 @@ export const Users: CollectionConfig = {
       defaultValue: "user",
       options: [
         { label: "Admin", value: "admin" },
+        { label: "Sales Manager", value: "sales_manager" },
         { label: "User", value: "user" },
       ],
       access: {

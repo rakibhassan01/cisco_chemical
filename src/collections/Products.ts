@@ -1,4 +1,5 @@
 import { CollectionConfig, FieldHook } from "payload";
+import type { User } from "../payload-types";
 
 const appURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -29,6 +30,12 @@ export const Products: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req: { user } }: { req: { user: User | null } }) =>
+      user?.role === "admin" || user?.role === "sales_manager",
+    update: ({ req: { user } }: { req: { user: User | null } }) =>
+      user?.role === "admin" || user?.role === "sales_manager",
+    delete: ({ req: { user } }: { req: { user: User | null } }) =>
+      user?.role === "admin",
   },
   fields: [
     {

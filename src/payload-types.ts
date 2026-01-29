@@ -138,7 +138,7 @@ export interface User {
   id: number;
   name: string;
   avatar?: (number | null) | Media;
-  role: 'admin' | 'user';
+  role: 'admin' | 'sales_manager' | 'user';
   /**
    * Items in the user's cart
    */

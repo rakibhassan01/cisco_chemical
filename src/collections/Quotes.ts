@@ -10,7 +10,7 @@ export const Quotes: CollectionConfig = {
   access: {
     read: ({ req: { user } }: { req: { user: User | null } }) => {
       if (!user) return false;
-      if (user.role === "admin") return true;
+      if (user.role === "admin" || user.role === "sales_manager") return true;
       return {
         user: {
           equals: user.id,
@@ -20,7 +20,7 @@ export const Quotes: CollectionConfig = {
     create: ({ req: { user } }: { req: { user: User | null } }) => !!user,
     update: ({ req: { user } }: { req: { user: User | null } }) => {
       if (!user) return false;
-      return user.role === "admin";
+      return user.role === "admin" || user.role === "sales_manager";
     },
     delete: ({ req: { user } }: { req: { user: User | null } }) => {
       if (!user) return false;
@@ -74,7 +74,7 @@ export const Quotes: CollectionConfig = {
       ],
       access: {
         update: ({ req: { user } }: { req: { user: User | null } }) =>
-          user?.role === "admin",
+          user?.role === "admin" || user?.role === "sales_manager",
       },
     },
     {
@@ -88,7 +88,7 @@ export const Quotes: CollectionConfig = {
       },
       access: {
         update: ({ req: { user } }: { req: { user: User | null } }) =>
-          user?.role === "admin",
+          user?.role === "admin" || user?.role === "sales_manager",
       },
     },
   ],
