@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useCurrency } from "@/providers/currency-provider";
 
 // Initialize Stripe outside component to avoid re-creation
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -27,6 +28,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const { items, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,7 +81,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
             Processing...
           </>
         ) : (
-          `Pay $${total.toLocaleString()}`
+          `Pay ${formatPrice(total)}`
         )}
       </Button>
       
@@ -93,6 +95,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
 
 export const CheckoutView = () => {
   const { items, total, isLoaded } = useCart();
+  const { formatPrice } = useCurrency();
   const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
@@ -167,7 +170,7 @@ export const CheckoutView = () => {
                             <h4 className="font-semibold text-sm text-gray-900 truncate">{item.name}</h4>
                             <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                         </div>
-                        <p className="font-bold text-sm text-gray-900">${(item.price * item.quantity).toLocaleString()}</p>
+                        <p className="font-bold text-sm text-gray-900">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                     ))}
                 </div>
@@ -175,7 +178,7 @@ export const CheckoutView = () => {
                 <div className="p-6 space-y-3 bg-gray-50/50">
                     <div className="flex justify-between text-sm text-gray-600">
                         <span>Subtotal</span>
-                        <span>${total.toLocaleString()}</span>
+                        <span>{formatPrice(total)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-gray-600">
                         <span>Shipping</span>
@@ -184,7 +187,7 @@ export const CheckoutView = () => {
                     <Separator className="bg-gray-200" />
                     <div className="flex justify-between text-lg font-bold text-gray-900">
                         <span>Total to Pay</span>
-                        <span>${total.toLocaleString()}</span>
+                        <span>{formatPrice(total)}</span>
                     </div>
                 </div>
               </CardContent>

@@ -40,11 +40,15 @@ export const createOrderAction = async (items: CartItem[], total: number) => {
         user: user.id,
         total: total,
         status: "processing",
-        items: items.map(item => ({
-          product: Number(item.id),
-          quantity: item.quantity,
-          price: item.price,
-        })),
+        items: items.map(item => {
+          const productId = Number(String(item.id).split('-')[0]);
+          return {
+            product: productId,
+            quantity: item.quantity,
+            price: item.price,
+            isSample: item.isSample || false,
+          };
+        }),
       },
     });
 

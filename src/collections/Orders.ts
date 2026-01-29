@@ -55,6 +55,11 @@ export const Orders: CollectionConfig = {
           type: "number",
           required: true,
         },
+        {
+          name: "isSample",
+          type: "checkbox",
+          defaultValue: false,
+        },
       ],
     },
   ],

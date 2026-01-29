@@ -14,6 +14,7 @@ import { User as UserType } from "@/payload-types";
 import { useCart } from "@/hooks/use-cart";
 import { ShoppingCart } from "lucide-react";
 import { CartSidebar } from "./cart-sidebar";
+import { CurrencyToggle } from "@/components/currency-toggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -146,6 +147,11 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
             </button>
           </CartSidebar>
 
+          {/* Currency Toggle - Desktop */}
+          <div className="hidden lg:block mr-2">
+            <CurrencyToggle />
+          </div>
+
           {/* User Navigation (Login/Profile) */}
           <div className="hidden sm:block">
             <UserNav user={user} />
@@ -195,6 +201,11 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
                         className="object-contain rounded-lg"
                       />
                     </div>
+
+                {/* Mobile Currency Toggle */}
+                <div className="flex justify-center mt-6">
+                  <CurrencyToggle />
+                </div>
                     <span className="text-2xl font-bold text-gray-900">
                       Cisco Chem
                     </span>

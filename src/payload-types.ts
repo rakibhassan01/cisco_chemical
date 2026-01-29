@@ -258,6 +258,7 @@ export interface Order {
         product: number | Product;
         quantity: number;
         price: number;
+        isSample?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -475,6 +476,7 @@ export interface OrdersSelect<T extends boolean = true> {
         product?: T;
         quantity?: T;
         price?: T;
+        isSample?: T;
         id?: T;
       };
   updatedAt?: T;

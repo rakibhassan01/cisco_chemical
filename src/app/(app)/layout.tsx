@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "Next app",
 };
 
+import { CurrencyProvider } from "@/providers/currency-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,7 +39,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <CurrencyProvider>{children}</CurrencyProvider>
+          </NuqsAdapter>
           <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>

@@ -5,9 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useCurrency } from "@/providers/currency-provider";
 
 export const CartView = () => {
   const { items, removeFromCart, updateQuantity, total, clearCart, isLoaded } = useCart();
+  const { formatPrice } = useCurrency();
 
   if (!isLoaded) {
     return (
@@ -105,7 +107,7 @@ export const CartView = () => {
                   {item.name}
                 </Link>
                 <p className="text-green-600 font-bold mt-1">
-                  ${item.price.toLocaleString()}
+                  {formatPrice(item.price)}
                 </p>
               </div>
 
@@ -158,7 +160,7 @@ export const CartView = () => {
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span>${total.toLocaleString()}</span>
+                <span>{formatPrice(total)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
@@ -166,7 +168,7 @@ export const CartView = () => {
               </div>
               <div className="border-t border-gray-100 pt-4 flex justify-between text-xl font-extrabold text-gray-900">
                 <span>Total</span>
-                <span>${total.toLocaleString()}</span>
+                <span>{formatPrice(total)}</span>
               </div>
             </div>
 

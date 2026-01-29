@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createQuoteAction } from "../../actions";
 import { getCurrentUser } from "@/modules/auth/actions";
+import { useCurrency } from "@/providers/currency-provider";
 
 interface ProductDetailViewProps {
   initialProduct: Product;
@@ -34,6 +35,7 @@ export const ProductDetailView = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(true);
   const [isSubmittingQuote, setIsSubmittingQuote] = useState(false);
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const effectiveServerURL =
     serverURL || process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
@@ -127,11 +129,11 @@ export const ProductDetailView = ({
             {/* Price section */}
             <div className="flex items-center gap-4 mb-6">
               <span className="text-3xl font-bold text-green-600">
-                {price ? `$${price}` : "Call for price"}
+                {price ? formatPrice(price) : "Call for price"}
               </span>
               {oldPrice && (
                 <span className="text-xl text-gray-400 line-through">
-                  ${oldPrice}
+                  {formatPrice(oldPrice)}
                 </span>
               )}
               {stock > 0 ? (
@@ -250,7 +252,7 @@ export const ProductDetailView = ({
                   className="w-full bg-white text-green-600 border-2 border-green-600 px-8 py-3 rounded-xl font-bold transition-all hover:bg-green-600 hover:text-white active:scale-95 flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  Order Lab Sample ($50)
+                  Order Lab Sample ({formatPrice(50)})
                 </button>
               </div>
             </div>

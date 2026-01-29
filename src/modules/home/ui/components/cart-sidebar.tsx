@@ -9,9 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import { useCurrency } from "@/providers/currency-provider";
 
 export const CartSidebar = ({ children }: { children: React.ReactNode }) => {
   const { items, removeFromCart, updateQuantity, total, count, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -76,7 +78,7 @@ export const CartSidebar = ({ children }: { children: React.ReactNode }) => {
                           {item.name}
                         </Link>
                         <p className="text-sm font-bold text-green-600">
-                          ${item.price.toLocaleString()}
+                          {formatPrice(item.price)}
                         </p>
                       </div>
                       
@@ -125,7 +127,7 @@ export const CartSidebar = ({ children }: { children: React.ReactNode }) => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Subtotal</span>
-                  <span className="font-semibold">${total.toLocaleString()}</span>
+                  <span className="font-semibold">{formatPrice(total)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Shipping</span>
@@ -134,7 +136,7 @@ export const CartSidebar = ({ children }: { children: React.ReactNode }) => {
                 <Separator className="my-2" />
                 <div className="flex justify-between text-base font-bold">
                   <span>Total</span>
-                  <span>${total.toLocaleString()}</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
               </div>
 

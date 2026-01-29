@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/payload-types";
+import { useCurrency } from "@/providers/currency-provider";
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +14,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const router = useRouter();
+  const { formatPrice } = useCurrency();
   const image = typeof product.mainImage === "object" && product.mainImage !== null
     ? (product.mainImage as { url?: string }).url
     : null;
@@ -53,9 +55,9 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             {product.name}
           </h3>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-950">${product.price}</span>
+            <span className="text-2xl font-black text-slate-950">{formatPrice(product.price)}</span>
             {product.oldPrice && (
-              <span className="text-sm text-slate-400 line-through font-bold">${product.oldPrice}</span>
+              <span className="text-sm text-slate-400 line-through font-bold">{formatPrice(product.oldPrice)}</span>
             )}
           </div>
         </div>
