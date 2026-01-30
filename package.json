@@ -10,7 +10,10 @@
     "lint": "eslint",
     "generate:types": "payload generate:types",
     "db:fresh": "payload migrate:fresh",
-    "db:seed": "npx tsx --env-file=.env src/scripts/seed.ts"
+    "db:seed": "npx tsx --env-file=.env src/scripts/seed.ts",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:report": "npx playwright show-report"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.17",
@@ -73,6 +76,7 @@
     "react-hook-form": "^7.69.0",
     "react-resizable-panels": "^3.0.2",
     "recharts": "^2.15.3",
+    "resend": "^6.9.1",
     "sonner": "^2.0.7",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0",
@@ -81,6 +85,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.58.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
