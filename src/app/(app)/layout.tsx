@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 };
 
 import { CurrencyProvider } from "@/providers/currency-provider";
+import { AssistantChat } from "@/components/assistant-chat";
+import { ChatErrorBoundary } from "@/components/chat-error-boundary";
 
 export default function RootLayout({
   children,
@@ -40,7 +42,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <NuqsAdapter>
-            <CurrencyProvider>{children}</CurrencyProvider>
+            <CurrencyProvider>
+             {children}
+              <ChatErrorBoundary>
+                <AssistantChat />
+              </ChatErrorBoundary>
+            </CurrencyProvider>
           </NuqsAdapter>
           <Toaster position="bottom-right" />
         </ThemeProvider>
