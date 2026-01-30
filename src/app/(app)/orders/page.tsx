@@ -5,6 +5,8 @@ import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { Order as OrderType, Quote as QuoteType } from "@/payload-types";
 
+export const dynamic = "force-dynamic";
+
 export default async function OrdersPage() {
   const user = await getCurrentUser();
 

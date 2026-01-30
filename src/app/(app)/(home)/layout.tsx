@@ -4,6 +4,8 @@ import { Navbar } from "@/modules/home/ui/components/navbar";
 import { getCurrentUser } from "@/modules/auth/actions";
 import { User as UserType } from "@/payload-types";
 
+export const dynamic = "force-dynamic";
+
 export default async function Layout({
   children,
 }: Readonly<{

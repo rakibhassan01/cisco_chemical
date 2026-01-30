@@ -5,6 +5,8 @@ import configPromise from "@payload-config";
 import { QuickOrderView } from "@/modules/dashboard/ui/views/quick-order-view";
 import { Product } from "@/payload-types";
 
+export const dynamic = "force-dynamic";
+
 export default async function QuickOrderPage() {
   const user = await getCurrentUser();
 
