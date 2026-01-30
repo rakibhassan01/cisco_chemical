@@ -8,7 +8,6 @@ export const maxDuration = 30;
 
 const googleAI = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY,
-  baseURL: "https://generativelanguage.googleapis.com/v1beta",
 });
 
 export async function POST(req: Request) {
@@ -87,7 +86,7 @@ Guidelines:
 
     // 2. Call Gemini
     const result = streamText({
-      model: googleAI("gemini-2.0-flash"),
+      model: googleAI("gemini-flash-latest"),
       system: systemPrompt,
       messages,
     });
