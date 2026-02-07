@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User, Search, X } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, User, Search, X, ChevronRight } from "lucide-react";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription 
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
@@ -135,7 +143,7 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
           {/* Cart Button - Desktop */}
           <CartSidebar>
             <button
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md relative"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:text-green-600 hover:border-green-300 transition-all duration-300 hover:shadow-md relative"
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="text-sm hidden lg:inline">Cart</span>
@@ -183,104 +191,123 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                <Menu className="h-5 w-5 text-gray-700" />
+              <SheetTrigger asChild>
+                <button className="p-2 rounded-lg hover:bg-zinc-100 transition-colors duration-200">
+                  <Menu className="h-5 w-5 text-zinc-700" />
+                </button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-full sm:w-80 bg-gradient-to-br from-white via-gray-50 to-green-50/30 border-l border-gray-200/60 backdrop-blur-xl"
+                className="w-full sm:w-80 p-0 flex flex-col bg-white border-l border-zinc-200"
               >
-                {/* Mobile Header */}
-                <div className="flex items-center justify-center pb-8 border-b border-gray-200/60">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 relative">
+                <div className="sr-only">
+                  <SheetHeader>
+                    <SheetTitle>Navigation Menu</SheetTitle>
+                    <SheetDescription>Access site links and account settings.</SheetDescription>
+                  </SheetHeader>
+                </div>
+
+                {/* Mobile Header - Visual */}
+                <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+                  <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+                    <div className="w-8 h-8 relative">
                       <Image
                         src="/images/logo.png"
                         alt="Logo"
                         fill
-                        className="object-contain rounded-lg"
+                        className="object-contain"
                       />
                     </div>
-
-                {/* Mobile Currency Toggle */}
-                <div className="flex justify-center mt-6">
-                  <CurrencyToggle />
-                </div>
-                    <span className="text-2xl font-bold text-gray-900">
-                      Cisco Chem
-                    </span>
-                  </div>
+                    <span className="text-lg font-bold text-zinc-900 tracking-tight">Cisco Chem</span>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsOpen(false)}
+                    className="w-8 h-8 rounded-full text-zinc-400 hover:text-zinc-900"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
                 </div>
 
                 {/* Mobile Navigation Links */}
-                <nav className="mt-8 space-y-3">
-                  {navLinks.map(({ href, label }, idx) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setIsOpen(false)}
-                      className="relative block px-6 py-4 rounded-xl text-center text-gray-800 bg-white/50 border border-gray-300 backdrop-blur-md transition-all duration-300 hover:text-green-600 hover:bg-white/70 hover:border-green-400"
-                      style={{
-                        animation: `slideInFromRight 0.4s ease-out ${idx * 0.1}s both`,
-                      }}
-                    >
-                      <span className="text-base font-medium tracking-wide">
-                        {label}
-                      </span>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110" />
-                    </Link>
-                  ))}
-
-                  {/* Mobile User Section */}
-                  <div
-                    className="pt-4"
-                    style={{
-                      animation: `slideInFromRight 0.4s ease-out ${navLinks.length * 0.1}s both`,
-                    }}
-                  >
-                    {!user ? (
-                      <Link
-                        href="/sign-in"
-                        onClick={() => setIsOpen(false)}
-                        className="block text-center px-6 py-4 rounded-xl bg-green-600 text-white font-medium tracking-wide transition-all duration-300 hover:bg-green-700"
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <User className="w-5 h-5" />
-                          Login to Account
-                        </div>
-                      </Link>
-                    ) : (
-                      <div className="space-y-3">
-                        <div className="px-6 py-4 rounded-xl bg-green-50 border border-green-100 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
-                            {user.name?.[0]?.toUpperCase() || "U"}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-gray-900 leading-none">
-                              {user.name}
-                            </span>
-                            <span className="text-xs text-gray-500 truncate max-w-[150px]">
-                              {user.email}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            await signOutAction();
-                            setIsOpen(false);
-                            toast.success("Signed out successfully");
+                <div className="flex-1 overflow-y-auto px-6 py-8">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-4 px-2">Main Menu</p>
+                    <nav className="space-y-1">
+                      {navLinks.map(({ href, label }, idx) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center justify-between px-4 py-3.5 rounded-xl text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-all duration-200 group"
+                          style={{
+                            animation: `fadeInUp 0.4s ease-out ${idx * 0.05}s both`,
                           }}
-                          className="w-full text-center px-6 py-4 rounded-xl border border-red-200 text-red-600 font-medium tracking-wide transition-all duration-300 hover:bg-red-50"
                         >
-                          Sign Out
-                        </button>
-                      </div>
-                    )}
+                          <span className="text-[15px] font-semibold tracking-tight">
+                            {label}
+                          </span>
+                          <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-zinc-400" />
+                        </Link>
+                      ))}
+                    </nav>
                   </div>
-                </nav>
+
+                  <div className="mt-10 pt-10 border-t border-zinc-100 space-y-6">
+                    <div className="px-2">
+                      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-4">Currency & Language</p>
+                      <CurrencyToggle />
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-4 px-2">Account</p>
+                      {!user ? (
+                        <Link
+                          href="/sign-in"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 w-full px-4 py-4 rounded-2xl bg-black text-white font-semibold transition-all hover:bg-zinc-800 shadow-sm"
+                        >
+                          <User className="w-5 h-5" />
+                          <span>Login to Account</span>
+                        </Link>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="px-4 py-4 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm">
+                              {user.name?.[0]?.toUpperCase() || "U"}
+                            </div>
+                            <div className="flex flex-col overflow-hidden">
+                              <span className="text-sm font-bold text-zinc-900 leading-tight truncate">
+                                {user.name}
+                              </span>
+                              <span className="text-xs text-zinc-500 truncate">
+                                {user.email}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              await signOutAction();
+                              setIsOpen(false);
+                              toast.success("Signed out successfully");
+                            }}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-zinc-200 text-zinc-600 font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
+                          >
+                            Sign Out
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Decorative Footer */}
-                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-green-50/40 to-transparent pointer-events-none"></div>
+                <div className="p-6 border-t border-zinc-100">
+                  <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-[0.3em] text-center">
+                    Cisco Chem Global v1.0
+                  </p>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
@@ -358,6 +385,17 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
           100% {
             opacity: 1;
             transform: translateX(0) scale(1);
+          }
+        }
+
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
 

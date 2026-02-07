@@ -10,21 +10,32 @@ import {
   MessageCircle, 
   Sparkles,
   Beaker,
-  Trash2,
   ChevronRight,
-  HandHelping,
   ShieldCheck,
-  Zap
+  Zap,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export const AssistantChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const { messages, sendMessage, status, error, setMessages } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+
+  // Auto-expand textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "inherit";
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 128)}px`; // Max 128px (max-h-32)
+    }
+  }, [inputValue]);
 
   useEffect(() => {
     if (error) {
@@ -34,20 +45,26 @@ export const AssistantChat = () => {
 
   const isStreaming = status === "streaming" || status === "submitted";
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 100;
-    setShowScrollButton(!isAtBottom);
+  const onScroll = () => {
+    if (viewportRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = viewportRef.current;
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100;
+      setShowScrollButton(!isAtBottom);
+    }
   };
 
   const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (viewportRef.current) {
+      viewportRef.current.scrollTo({
+        top: viewportRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
   }, [messages, status]);
 
   const handleManualSubmit = (e?: React.FormEvent) => {
@@ -87,18 +104,20 @@ export const AssistantChat = () => {
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.1, y: -4 }}
-        whileTap={{ scale: 0.9 }}
         className="fixed bottom-6 right-6 z-[100]"
       >
         <Button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 rounded-full bg-gradient-to-tr from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 shadow-[0_12px_44px_rgba(16,185,129,0.4)] flex items-center justify-center group border-none relative"
+          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black hover:bg-zinc-800 shadow-xl flex items-center justify-center group border-none relative overflow-hidden"
           size="icon"
         >
-          <div className="absolute inset-0 rounded-full bg-white/20 animate-ping [animation-duration:3s]" />
-          <MessageCircle className="w-8 h-8 text-white group-hover:rotate-12 transition-transform duration-300 relative z-10" />
-          <div className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-500 rounded-full border-2 border-white animate-pulse z-20 shadow-lg" />
+          <motion.div 
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white relative z-10" />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         </Button>
       </motion.div>
 
@@ -106,232 +125,193 @@ export const AssistantChat = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 120, scale: 0.8, filter: "blur(15px)" }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: 120, scale: 0.8, filter: "blur(15px)" }}
-            transition={{ type: "spring", damping: 28, stiffness: 450 }}
-            className="fixed bottom-24 right-6 z-[100] w-[420px] h-[720px] bg-white/98 backdrop-blur-3xl rounded-[3rem] border border-white/40 shadow-[0_40px_120px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden ring-1 ring-black/[0.08]"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className={cn(
+              "fixed z-[110] bg-white shadow-2xl flex flex-col overflow-hidden",
+              "inset-0 h-[100dvh] sm:h-[650px] sm:inset-auto sm:bottom-24 sm:right-6 sm:w-[420px] sm:rounded-2xl sm:border sm:border-zinc-200"
+            )}
           >
             {/* Header */}
-            <div className="p-8 bg-gradient-to-br from-green-600 via-emerald-600 to-green-800 text-white flex items-center justify-between shadow-2xl relative overflow-hidden group">
-              {/* Decorative elements */}
-              <div className="absolute -top-12 -right-12 w-56 h-56 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-1000" />
-              <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-emerald-400/20 rounded-full blur-2xl" />
-              
-              <div className="flex items-center gap-5 relative z-10">
-                <div className="w-16 h-16 rounded-[1.5rem] bg-white/20 backdrop-blur-md flex items-center justify-center relative border border-white/30 shadow-[inset_0_2px_2px_rgba(255,255,255,0.4)] group-hover:scale-110 transition-transform duration-700">
-                  <Bot className="w-8 h-8 text-white" />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 border-2 border-green-700 rounded-full shadow-xl" />
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center">
+                  <Bot className="w-6 h-6 text-zinc-900" />
                 </div>
                 <div>
-                  <h3 className="font-black text-xl tracking-tight leading-none mb-2">Cisco Assistant</h3>
-                  <div className="flex items-center gap-2 opacity-90">
-                    <div className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-                    <span className="text-[11px] uppercase font-black tracking-[0.25em] text-emerald-100/90">Enterprise AI</span>
+                  <h3 className="font-semibold text-sm text-zinc-900 leading-tight">Cisco AI</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Online</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 relative z-10">
-                <button
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={handleClearChat}
-                  title="Clear Conversation"
-                  className="p-3.5 hover:bg-white/20 rounded-2xl transition-all text-white/80 hover:text-white group/btn backdrop-blur-sm border border-white/10"
+                  className="w-8 h-8 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  title="Clear conversation"
                 >
-                  <Trash2 className="w-5 h-5 group-hover/btn:scale-110" />
-                </button>
-                <button
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setIsOpen(false)}
-                  className="p-3.5 hover:bg-white/20 rounded-2xl transition-all group/btn backdrop-blur-sm border border-white/10"
+                  className="w-8 h-8 rounded-full text-zinc-400 hover:text-zinc-900 transition-colors"
                 >
-                  <X className="w-6 h-6 group-hover/btn:scale-110" />
-                </button>
+                  <X className="w-5 h-5" />
+                </Button>
               </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 relative overflow-hidden bg-[radial-gradient(circle_at_40%_20%,rgba(16,185,129,0.04),transparent_60%)] bg-white">
+            <div className="flex-1 relative bg-zinc-50/30 min-h-0">
               <ScrollArea 
-                className="h-full px-8 pt-8" 
-                type="scroll"
+                className="h-full" 
+                viewportRef={viewportRef}
                 onScroll={onScroll}
               >
-                <div className="space-y-10 pb-10 pr-2">
+                <div className="px-6 py-8 space-y-6">
                   {messages.length === 0 && (
-                    <div className="py-12 space-y-12">
-                      {/* Hero Welcome */}
-                      <div className="text-center space-y-6">
-                        <motion.div 
-                          initial={{ scale: 0.5, opacity: 0, rotate: -15 }}
-                          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                          className="w-28 h-28 bg-gradient-to-br from-green-50 via-emerald-50 to-white rounded-[3rem] flex items-center justify-center mx-auto text-green-600 shadow-[0_10px_30px_rgba(16,185,129,0.1)] ring-1 ring-green-100/50"
-                        >
-                          <HandHelping className="w-14 h-14" />
-                        </motion.div>
-                        <div className="space-y-3 px-4">
-                          <h4 className="font-black text-3xl text-gray-900 tracking-tighter leading-tight">Elite Support</h4>
-                          <p className="text-[15px] text-gray-500 font-medium max-w-[300px] mx-auto leading-relaxed">
-                            Certified chemicals, bespoke pricing, and global logistics simplified.
-                          </p>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-8"
+                    >
+                      <div className="text-center space-y-3 pt-4">
+                        <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-100 flex items-center justify-center mx-auto mb-4">
+                          <Sparkles className="w-6 h-6 text-zinc-900" />
                         </div>
+                        <h4 className="text-lg font-semibold text-zinc-900 tracking-tight">How can I help?</h4>
+                        <p className="text-sm text-zinc-500 max-w-[240px] mx-auto leading-relaxed">
+                          Ask about our chemicals, pricing, or industrial solutions.
+                        </p>
                       </div>
 
-                      {/* Featured Quick Actions */}
-                      <div className="space-y-5">
-                        <div className="flex items-center gap-4 px-4">
-                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-100 to-gray-200" />
-                          <p className="text-[12px] font-black uppercase tracking-[0.3em] text-gray-400">Core Services</p>
-                          <div className="h-px flex-1 bg-gradient-to-l from-transparent via-gray-100 to-gray-200" />
-                        </div>
-                        <div className="grid grid-cols-1 gap-4 px-2">
-                          {[
-                            { icon: Zap, text: "Explore Chemical Catalog", color: "text-amber-500", bg: "bg-amber-50" },
-                            { icon: ShieldCheck, text: "Bulk Quote & Strategy", color: "text-blue-500", bg: "bg-blue-50" },
-                            { icon: Beaker, text: "Lab Specs & Safety", color: "text-purple-500", bg: "bg-purple-50" }
-                          ].map((item, idx) => (
-                            <motion.button
-                              key={idx}
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: 0.1 * idx }}
-                              onClick={() => handleSuggestionClick(item.text)}
-                              className="w-full flex items-center justify-between p-6 bg-white hover:bg-gray-50/50 rounded-[2rem] border border-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:translate-y-[-4px] hover:border-green-200 transition-all duration-500 group"
-                            >
-                              <div className="flex items-center gap-5">
-                                <div className={`w-12 h-12 ${item.bg} rounded-[1.25rem] flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>
-                                   <item.icon className={`w-6 h-6 ${item.color}`} />
-                                </div>
-                                <span className="text-[16px] font-extrabold text-gray-700 tracking-tight">{item.text}</span>
-                              </div>
-                              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green-600 transition-all duration-300">
-                                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-                              </div>
-                            </motion.button>
-                          ))}
-                        </div>
+                      <div className="grid gap-2">
+                        {[
+                          { text: "Browse product catalog", icon: Zap },
+                          { text: "Request a bulk quote", icon: ShieldCheck },
+                          { text: "View safety datasheets", icon: Beaker }
+                        ].map((item, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSuggestionClick(item.text)}
+                            className="flex items-center gap-3 w-full p-4 bg-white border border-zinc-100 rounded-xl hover:border-zinc-300 hover:shadow-sm transition-all text-left text-sm font-medium text-zinc-700 group"
+                          >
+                            <item.icon className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
+                            {item.text}
+                          </button>
+                        ))}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {messages.map((m) => (
                     <motion.div
                       key={m.id}
-                      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} gap-4`}
-                    >
-                      {m.role !== "user" && (
-                        <div className="w-11 h-11 shrink-0 rounded-[1.25rem] bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-[13px] font-black shadow-lg shadow-green-500/20 border border-green-400/20 tracking-tighter uppercase transition-transform hover:scale-105">
-                          AI
-                        </div>
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "flex flex-col gap-2 max-w-[85%]",
+                        m.role === "user" ? "ml-auto items-end" : "mr-auto items-start"
                       )}
+                    >
                       <div
-                        className={`max-w-[85%] p-6 rounded-[2.25rem] text-[16px] leading-[1.7] shadow-sm whitespace-pre-wrap ${
+                        className={cn(
+                          "px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed",
                           m.role === "user"
-                            ? "bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 text-white font-semibold rounded-tr-none shadow-green-600/30 ring-1 ring-white/10"
-                            : "bg-white text-gray-800 rounded-tl-none border border-gray-100 relative overflow-hidden ring-1 ring-black/[0.02]"
-                        }`}
-                      >
-                        {m.role !== "user" && (
-                          <div className="absolute top-0 right-0 w-24 h-24 bg-green-50/40 rounded-full blur-3xl -translate-y-12 translate-x-12 pointer-events-none" />
+                            ? "bg-black text-white rounded-tr-none"
+                            : "bg-white text-zinc-800 border border-zinc-200 rounded-tl-none"
                         )}
+                      >
                         {getMessageText(m)}
                       </div>
+                      <span className="text-[10px] text-zinc-400 font-medium px-1 uppercase tracking-wider">
+                        {m.role === "user" ? "You" : "Cisco AI"}
+                      </span>
                     </motion.div>
                   ))}
 
                   {isStreaming && (
-                    <div className="flex justify-start gap-4">
-                      <div className="w-11 h-11 shrink-0 rounded-[1.25rem] bg-green-50 flex items-center justify-center relative shadow-sm border border-green-100 overflow-hidden">
-                        <Sparkles className="w-6 h-6 text-green-600 animate-pulse" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-green-100/50 to-transparent animate-pulse" />
-                      </div>
-                      <div className="bg-white rounded-[2rem] rounded-tl-none border border-gray-100 p-6 shadow-sm ring-1 ring-black/[0.01]">
-                         <div className="flex gap-2.5 items-center">
-                            <span className="w-3 h-3 bg-green-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                            <span className="w-3 h-3 bg-green-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                            <span className="w-3 h-3 bg-green-600 rounded-full animate-bounce" />
-                         </div>
+                    <div className="flex flex-col gap-2 max-w-[85%] mr-auto items-start">
+                      <div className="bg-white border border-zinc-200 px-4 py-3 rounded-2xl rounded-tl-none">
+                        <div className="flex gap-1.5 items-center">
+                          <div className="w-1.5 h-1.5 bg-zinc-300 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                          <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                          <div className="w-1.5 h-1.5 bg-zinc-500 rounded-full animate-bounce" />
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {error && (
-                    <motion.div 
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="p-6 bg-red-50 text-red-600 text-[14px] rounded-[2rem] border border-red-100 font-bold text-center shadow-lg shadow-red-500/5"
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                         <div className="p-3 bg-red-100 rounded-2xl">
-                            <Zap className="w-6 h-6" />
-                         </div>
-                         <p>
-                          {error.message?.includes("429") || error.message?.includes("Quota") 
-                            ? "AI Capacity limit reached. Please wait 15s." 
-                            : "AI connection disrupted."}
-                         </p>
-                         <button onClick={handleClearChat} className="px-6 py-2.5 bg-red-600 text-white border-none rounded-2xl hover:bg-red-700 transition-all text-[12px] font-black uppercase tracking-widest shadow-lg shadow-red-600/20 active:scale-95">
-                          Reset Stream
-                        </button>
-                      </div>
-                    </motion.div>
+                    <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-center">
+                      <p className="text-xs text-red-600 font-medium">
+                        Something went wrong. Please try again later.
+                      </p>
+                    </div>
                   )}
-                  <div ref={messagesEndRef} className="h-10" />
+                  <div ref={messagesEndRef} className="h-4" />
                 </div>
               </ScrollArea>
-              
-              {/* Floating Scroll to Bottom Button */}
+
+              {/* Scroll to bottom button */}
               <AnimatePresence>
                 {showScrollButton && (
                   <motion.button
-                    initial={{ opacity: 0, y: 20, scale: 0.8, x: "-50%" }}
-                    animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
-                    exit={{ opacity: 0, y: 20, scale: 0.8, x: "-50%" }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
                     onClick={scrollToBottom}
-                    className="absolute bottom-6 left-1/2 px-6 py-3 bg-green-600 text-white rounded-full shadow-[0_15px_40px_rgba(16,185,129,0.4)] hover:bg-green-700 transition-all z-20 flex items-center gap-3 text-[12px] font-black uppercase tracking-widest border border-white/30 backdrop-blur-sm"
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 p-2 bg-white border border-zinc-200 rounded-full shadow-lg hover:bg-zinc-50 transition-colors z-20"
                   >
-                    <span>Jump to Latest</span>
-                    <ChevronRight className="w-4 h-4 rotate-90" />
+                    <ChevronRight className="w-4 h-4 rotate-90 text-zinc-500" />
                   </motion.button>
                 )}
               </AnimatePresence>
-
-              {/* Enhanced Depth Shadows */}
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white via-white/40 to-transparent pointer-events-none z-10" />
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/40 to-transparent pointer-events-none z-10" />
             </div>
 
             {/* Input Area */}
-            <div className="p-8 bg-white/90 backdrop-blur-3xl border-t border-gray-100/60 space-y-5">
+            <div className="p-4 sm:p-6 bg-white border-t border-zinc-100 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-6">
               <form
                 onSubmit={handleManualSubmit}
-                className="relative bg-gray-50/70 border border-gray-200 rounded-[2.25rem] shadow-[inset_0_2px_4px_rgba(0,0,0,0.03)] focus-within:bg-white focus-within:border-green-500 focus-within:ring-[8px] focus-within:ring-green-500/10 transition-all duration-700"
+                className="relative flex items-end gap-2 max-w-4xl mx-auto w-full"
               >
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask Cisco enterprise AI..."
-                  className="w-full px-8 py-6 bg-transparent outline-none text-lg font-bold text-gray-800 placeholder:text-gray-400 placeholder:font-semibold"
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                   <Button
-                    type="submit"
-                    disabled={isStreaming || !inputValue}
-                    className="w-14 h-14 bg-gradient-to-tr from-green-600 to-emerald-500 text-white rounded-[1.5rem] flex items-center justify-center hover:from-green-700 hover:to-emerald-600 transition-all duration-500 disabled:opacity-30 shadow-xl shadow-green-600/40 active:scale-90 border-none group/send overflow-hidden"
-                    size="icon"
-                   >
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/send:translate-y-0 transition-transform duration-500" />
-                    <Send className="w-6 h-6 group-hover/send:translate-x-1 group-hover/send:-translate-y-1 transition-transform relative z-10" />
-                   </Button>
+                <div className="relative flex-1">
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleManualSubmit();
+                      }
+                    }}
+                    placeholder="Type a message..."
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 pr-14 text-[16px] text-zinc-900 focus:outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none max-h-32 placeholder:text-zinc-400 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                  />
+                  <div className="absolute right-2.5 bottom-2.5">
+                    <Button
+                      type="submit"
+                      disabled={isStreaming || !inputValue.trim()}
+                      className="w-10 h-10 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl transition-all disabled:opacity-20 p-0 shadow-sm"
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </div>
                 </div>
               </form>
-              <div className="flex items-center justify-center gap-3">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                 <p className="text-[11px] text-gray-400 font-extrabold uppercase tracking-[0.4em] leading-none">
-                   Enterprise Core v1.2
-                 </p>
-              </div>
+              <p className="text-[10px] text-zinc-400 text-center mt-3 font-medium uppercase tracking-[0.2em] hidden sm:block">
+                Cisco AI Enterprise Support
+              </p>
             </div>
           </motion.div>
         )}
