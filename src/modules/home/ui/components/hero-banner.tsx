@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AnimatedCounter } from "./animated-counter";
 import { ScientificOverlay } from "./scientific-overlay";
+import { cn } from "@/lib/utils";
 
 interface Slide {
   title: string;
@@ -97,7 +98,7 @@ const HeroBanner: React.FC = () => {
   }, [nextSlide]);
 
   return (
-    <section className="relative h-[90vh] lg:h-screen w-full flex items-center pt-20 lg:pt-24 overflow-hidden bg-white text-slate-900 border-b border-slate-100">
+    <section className="relative min-h-[90vh] lg:h-screen w-full flex items-center pt-32 sm:pt-24 lg:pt-24 overflow-hidden bg-white text-slate-900 border-b border-slate-100">
       {/* Immersive Background Layer */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -117,7 +118,7 @@ const HeroBanner: React.FC = () => {
           />
           {/* Immersive white gradient overlay */}
           <div
-            className={`absolute inset-0 bg-gradient-to-r ${slides[currentSlide].bgGradient} z-10`}
+            className={`absolute inset-0 bg-gradient-to-b sm:bg-gradient-to-r from-white via-white/95 to-white/20 sm:from-white sm:via-white/80 sm:to-transparent z-10`}
           />
         </motion.div>
       </AnimatePresence>
@@ -134,54 +135,59 @@ const HeroBanner: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-emerald-100/50 text-emerald-700 text-[10px] font-bold tracking-[0.2em] uppercase mb-10 shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 sm:bg-white/80 backdrop-blur-md rounded-full border border-emerald-100/50 text-emerald-700 text-[10px] sm:text-[10px] font-bold tracking-[0.2em] uppercase mb-8 sm:mb-10 shadow-sm"
           >
             <FlaskConical className="w-3.5 h-3.5" />
             <span>Pioneering Science</span>
           </motion.div>
 
           {/* Dynamic Content */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`content-${currentSlide}`}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 30 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-8"
-            >
-              <h1 className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold leading-[0.9] tracking-tighter text-slate-950">
-                <span className="block opacity-90 drop-shadow-sm">
-                  {slides[currentSlide].title.split(" ").slice(0, -2).join(" ")}
-                </span>
-                <span
-                  className={`${slides[currentSlide].accent} block drop-shadow-sm`}
-                >
-                  {slides[currentSlide].title.split(" ").slice(-2).join(" ")}
-                </span>
-              </h1>
+          <div className="relative">
+            {/* Mobile Background Glow for Legibility */}
+            <div className="absolute -inset-4 bg-white/40 blur-2xl rounded-[3rem] sm:hidden -z-10" />
+            
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`content-${currentSlide}`}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 30 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-6 sm:space-y-8"
+              >
+                <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-[5.5rem] font-bold leading-[1.1] sm:leading-[0.9] tracking-[-0.03em] sm:tracking-tighter text-slate-950">
+                  <span className="block opacity-90 drop-shadow-sm">
+                    {slides[currentSlide].title.split(" ").slice(0, -2).join(" ")}
+                  </span>
+                  <span
+                    className={`${slides[currentSlide].accent} block drop-shadow-sm italic sm:not-italic`}
+                  >
+                    {slides[currentSlide].title.split(" ").slice(-2).join(" ")}
+                  </span>
+                </h1>
 
-              <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 pt-4 items-start">
-                <p className="lg:col-span-7 text-xl lg:text-3xl text-slate-800 font-semibold leading-tight border-l-4 border-emerald-500 pl-6">
-                  {slides[currentSlide].subtitle}
-                </p>
-                <p className="lg:col-span-5 text-lg text-slate-500 font-medium leading-relaxed max-w-md">
-                  {slides[currentSlide].description}
-                </p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 pt-2 items-start">
+                  <p className="lg:col-span-7 text-lg sm:text-xl lg:text-3xl text-slate-800 font-semibold leading-tight border-l-4 border-emerald-500 pl-4 sm:pl-6 max-w-xl">
+                    {slides[currentSlide].subtitle}
+                  </p>
+                  <p className="lg:col-span-5 text-sm sm:text-lg text-slate-500 font-medium leading-relaxed max-w-md opacity-80 sm:opacity-100">
+                    {slides[currentSlide].description}
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap gap-5 mt-16"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-5 mt-12 sm:mt-16"
           >
             <Link
               href="/products"
-              className="group relative inline-flex items-center justify-center px-10 py-5 bg-emerald-600 rounded-[2rem] text-white font-bold text-lg hover:bg-emerald-700 transition-all duration-500 shadow-2xl shadow-emerald-200 active:scale-95 overflow-hidden"
+              className="group relative inline-flex items-center justify-center px-8 sm:px-10 py-4 sm:py-5 bg-emerald-600 rounded-2xl sm:rounded-[2rem] text-white font-bold text-base sm:text-lg hover:bg-emerald-700 transition-all duration-500 shadow-xl shadow-emerald-200 active:scale-95 overflow-hidden"
             >
               <span className="relative z-10 flex items-center">
                 Explore Solutions
@@ -190,9 +196,9 @@ const HeroBanner: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </Link>
 
-            <button className="inline-flex items-center justify-center px-10 py-5 bg-white/50 backdrop-blur-xl rounded-[2rem] text-slate-700 font-bold text-lg border-2 border-white hover:border-emerald-200 hover:bg-white/80 transition-all duration-500 active:scale-95 group shadow-lg">
-              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-3 group-hover:bg-emerald-200 transition-colors">
-                <Play className="w-4 h-4 text-emerald-600 fill-emerald-600 ml-0.5" />
+            <button className="inline-flex items-center justify-center px-8 sm:px-10 py-4 sm:py-5 bg-white/80 sm:bg-white/50 backdrop-blur-xl rounded-2xl sm:rounded-[2rem] text-slate-700 font-bold text-base sm:text-lg border border-slate-200 sm:border-2 sm:border-white hover:border-emerald-200 hover:bg-white/90 transition-all duration-500 active:scale-95 group shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-3 group-hover:bg-emerald-200 transition-colors">
+                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 fill-emerald-600 ml-0.5" />
               </div>
               Innovation Deck
             </button>
@@ -203,15 +209,18 @@ const HeroBanner: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-12 mt-20 pt-12 border-t border-slate-200/50"
+            className="hidden sm:grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-12 mt-16 sm:mt-20 pt-8 sm:pt-12 border-t border-slate-200/50"
           >
             {stats.map((stat, idx) => (
-              <div key={idx} className="group cursor-default">
+              <div key={idx} className={cn(
+                "group cursor-default",
+                idx >= 2 ? "hidden xs:block sm:block" : "block"
+              )}>
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="p-2 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
-                    <stat.icon className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+                  <div className="p-1.5 sm:p-2 bg-emerald-50 rounded-lg sm:rounded-xl group-hover:bg-emerald-100 transition-colors">
+                    <stat.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
                   </div>
-                  <span className="text-3xl font-black text-slate-950 tracking-tight">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
                     <AnimatedCounter
                       endValue={stat.value}
                       hasPlus={stat.value.includes("+")}
@@ -219,7 +228,7 @@ const HeroBanner: React.FC = () => {
                     />
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.15em] pl-1 group-hover:text-emerald-700 transition-colors">
+                <p className="text-[9px] sm:text-[11px] text-slate-400 font-black uppercase tracking-[0.1em] sm:tracking-[0.15em] pl-1 group-hover:text-emerald-700 transition-colors">
                   {stat.label}
                 </p>
               </div>

@@ -104,7 +104,7 @@ export const AssistantChat = () => {
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="fixed bottom-6 right-6 z-[100]"
+        className="fixed bottom-28 sm:bottom-6 right-6 z-[100]"
       >
         <Button
           onClick={() => setIsOpen(true)}

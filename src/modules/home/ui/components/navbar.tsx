@@ -11,7 +11,6 @@ import {
   SheetTitle, 
   SheetDescription 
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
@@ -220,14 +219,6 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
                     </div>
                     <span className="text-lg font-bold text-zinc-900 tracking-tight">Cisco Chem</span>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                    className="w-8 h-8 rounded-full text-zinc-400 hover:text-zinc-900"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
                 </div>
 
                 {/* Mobile Navigation Links */}
