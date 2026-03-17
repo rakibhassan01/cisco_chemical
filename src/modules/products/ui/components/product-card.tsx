@@ -46,10 +46,10 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         )}
       </div>
 
-      <div className="p-8 flex-1 flex flex-col">
+      <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col">
         <div className="mb-4">
           <h3 
-            className="text-xl font-black text-slate-900 leading-tight mb-2 group-hover:text-emerald-600 transition-colors cursor-pointer" 
+            className="text-lg sm:text-xl font-black text-slate-900 leading-tight mb-2 group-hover:text-emerald-600 transition-colors cursor-pointer" 
             onClick={() => router.push(`/products/${product.slug}`)}
           >
             {product.name}
@@ -70,15 +70,15 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           <button
             onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
             disabled={product.stock === 0}
-            className="flex items-center justify-center gap-2 py-4 bg-slate-50 hover:bg-emerald-50 text-slate-900 hover:text-emerald-700 rounded-2xl font-black text-xs transition-all border border-slate-100 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+            className="flex items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-4 bg-slate-50 hover:bg-emerald-50 text-slate-900 hover:text-emerald-700 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs transition-all border border-slate-100 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
           >
-            <ShoppingCart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+            <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 group-hover/btn:scale-110 transition-transform" />
             CART
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onAddToCart(); router.push('/cart'); }}
             disabled={product.stock === 0}
-            className="flex items-center justify-center gap-2 py-4 bg-slate-950 hover:bg-emerald-600 text-white rounded-2xl font-black text-xs transition-all shadow-xl shadow-slate-200 hover:shadow-emerald-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-4 bg-slate-950 hover:bg-emerald-600 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs transition-all shadow-xl shadow-slate-200 hover:shadow-emerald-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             BUY NOW
           </button>
