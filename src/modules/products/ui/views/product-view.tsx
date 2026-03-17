@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useQueryState, parseAsInteger, parseAsBoolean } from "nuqs";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Product, Category } from "@/payload-types";
 import { useCart } from "@/hooks/use-cart";
 import {
@@ -27,6 +27,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 interface ProductsViewProps {
   initialProducts?: Product[];
@@ -140,183 +149,233 @@ export function ProductsView({
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar Filters */}
-          <aside className="lg:w-80 w-full shrink-0">
-            <div className="sticky top-28">
-              <ProductFilters
-                categories={categories}
-                selectedCategory={category}
-                onCategoryChange={(val) => {
-                  setCategory(val);
-                  setPage(1);
-                }}
-                priceRange={[minPrice, maxPrice]}
-                onPriceChange={(range) => {
-                  setMinPrice(range[0]);
-                  setMaxPrice(range[1]);
-                  setPage(1);
-                }}
-                inStock={inStock}
-                onInStockChange={(val) => {
-                  setInStock(val);
-                  setPage(1);
-                }}
-                onReset={() => {
-                  setCategory("all");
-                  setMinPrice(0);
-                  setMaxPrice(10000);
-                  setInStock(false);
-                  setSearch("");
-                  setPage(1);
-                }}
-              />
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1 space-y-8">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm">
-              <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-2xl border-none text-xs font-black focus:ring-2 focus:ring-emerald-500 transition-all uppercase tracking-wider"
-                />
+        <div className="flex flex-col gap-8">
+          {/* Mobile Filter Trigger & Toolbar */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 font-bold" />
+                  <input
+                    type="text"
+                    placeholder="Search chemicals..."
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-slate-100 text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition-all uppercase tracking-wider shadow-sm"
+                  />
+                </div>
+                
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="lg:hidden flex items-center gap-2 rounded-2xl border-slate-100 bg-white h-11 px-4 font-black text-[10px] uppercase tracking-widest shadow-sm">
+                      <SlidersHorizontal className="w-4 h-4" />
+                      Filters
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-full sm:w-[350px] p-0 border-r-0">
+                    <div className="h-full overflow-y-auto p-6 pt-10">
+                      <SheetHeader className="mb-8">
+                        <SheetTitle className="text-left font-black text-2xl tracking-tighter uppercase">Filters</SheetTitle>
+                        <SheetDescription className="text-left font-medium text-slate-500">Simplify your chemical search</SheetDescription>
+                      </SheetHeader>
+                      <ProductFilters
+                        categories={categories}
+                        selectedCategory={category}
+                        onCategoryChange={(val) => {
+                          setCategory(val);
+                          setPage(1);
+                        }}
+                        priceRange={[minPrice, maxPrice]}
+                        onPriceChange={(range) => {
+                          setMinPrice(range[0]);
+                          setMaxPrice(range[1]);
+                          setPage(1);
+                        }}
+                        inStock={inStock}
+                        onInStockChange={(val) => {
+                          setInStock(val);
+                          setPage(1);
+                        }}
+                        onReset={() => {
+                          setCategory("all");
+                          setMinPrice(0);
+                          setMaxPrice(10000);
+                          setInStock(false);
+                          setSearch("");
+                          setPage(1);
+                        }}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
 
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <p className="text-[10px] font-black text-slate-400 hidden sm:block uppercase tracking-[0.2em]">
-                  {data.totalDocs} Products
-                </p>
-                <div className="h-8 w-[1px] bg-slate-100 hidden sm:block" />
+              <div className="hidden sm:flex items-center gap-4">
                 <Select value={sort} onValueChange={(val) => setSort(val)}>
-                  <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-slate-100 bg-slate-50 h-10 font-black text-slate-700 text-[10px] uppercase tracking-widest">
+                  <SelectTrigger className="w-[180px] rounded-2xl border-slate-100 bg-white h-11 font-black text-slate-700 text-[10px] uppercase tracking-widest shadow-sm">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-slate-100">
-                    <SelectItem
-                      value="-createdAt"
-                      className="font-black text-[10px] uppercase tracking-widest"
-                    >
-                      Newest First
-                    </SelectItem>
-                    <SelectItem
-                      value="price"
-                      className="font-black text-[10px] uppercase tracking-widest"
-                    >
-                      Price: Low to High
-                    </SelectItem>
-                    <SelectItem
-                      value="-price"
-                      className="font-black text-[10px] uppercase tracking-widest"
-                    >
-                      Price: High to Low
-                    </SelectItem>
-                    <SelectItem
-                      value="name"
-                      className="font-black text-[10px] uppercase tracking-widest"
-                    >
-                      Name: A to Z
-                    </SelectItem>
+                  <SelectContent className="rounded-2xl border-slate-100">
+                    <SelectItem value="-createdAt" className="font-black text-[10px] uppercase tracking-widest">Newest First</SelectItem>
+                    <SelectItem value="price" className="font-black text-[10px] uppercase tracking-widest">Price: Low to High</SelectItem>
+                    <SelectItem value="-price" className="font-black text-[10px] uppercase tracking-widest">Price: High to Low</SelectItem>
+                    <SelectItem value="name" className="font-black text-[10px] uppercase tracking-widest">Name: A to Z</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Grid */}
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="space-y-4">
-                    <Skeleton className="h-64 w-full rounded-[2rem]" />
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-4 w-full" />
-                  </div>
-                ))}
-              </div>
-            ) : data.products.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {data.products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={() =>
-                      addToCart({
-                        id: String(product.id),
-                        name: product.name,
-                        price: product.price,
-                        image:
-                          typeof product.mainImage === "object" &&
-                          product.mainImage !== null
-                            ? (product.mainImage as { url?: string }).url || ""
-                            : "",
-                        slug: product.slug || "",
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            ) : (
-              <NoResults
-                onClear={() => {
-                  setSearch("");
-                  setCategory("all");
-                  setMinPrice(0);
-                  setMaxPrice(10000);
-                  setInStock(false);
-                  setPage(1);
-                }}
-              />
-            )}
-
-            {/* Pagination */}
-            {data.totalPages > 1 && (
-              <div className="flex justify-center pt-12">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => page > 1 && handlePageChange(page - 1)}
-                        className={`cursor-pointer ${page === 1 ? "opacity-50 pointer-events-none" : ""}`}
-                      />
-                    </PaginationItem>
-
-                    {[...Array(data.totalPages)].map((_, i) => {
-                      const p = i + 1;
-                      return (
-                        <PaginationItem key={p}>
-                          <PaginationLink
-                            isActive={page === p}
-                            onClick={() => handlePageChange(p)}
-                            className="cursor-pointer"
-                          >
-                            {p}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })}
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() =>
-                          page < data.totalPages && handlePageChange(page + 1)
-                        }
-                        className={`cursor-pointer ${page === data.totalPages ? "opacity-50 pointer-events-none" : ""}`}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+            {/* Active Filter Chips */}
+            {(category !== "all" || inStock || search) && (
+              <div className="flex flex-wrap gap-2">
+                {category !== "all" && (
+                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[10px] font-black uppercase tracking-wider">
+                     Cat: {categories.find(c => String(c.id) === category)?.name || category}
+                     <button onClick={() => setCategory("all")}><X className="w-3 h-3"/></button>
+                   </div>
+                )}
+                {inStock && (
+                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[10px] font-black uppercase tracking-wider">
+                     In Stock
+                     <button onClick={() => setInStock(false)}><X className="w-3 h-3"/></button>
+                   </div>
+                )}
+                {search && (
+                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[10px] font-black uppercase tracking-wider">
+                     &ldquo;{search}&rdquo;
+                     <button onClick={() => setSearch("")}><X className="w-3 h-3"/></button>
+                   </div>
+                )}
               </div>
             )}
-          </main>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-12">
+            {/* Desktop Filters Sidebar */}
+            <aside className="hidden lg:block lg:w-80 shrink-0">
+              <div className="sticky top-28">
+                <ProductFilters
+                  categories={categories}
+                  selectedCategory={category}
+                  onCategoryChange={(val) => {
+                    setCategory(val);
+                    setPage(1);
+                  }}
+                  priceRange={[minPrice, maxPrice]}
+                  onPriceChange={(range) => {
+                    setMinPrice(range[0]);
+                    setMaxPrice(range[1]);
+                    setPage(1);
+                  }}
+                  inStock={inStock}
+                  onInStockChange={(val) => {
+                    setInStock(val);
+                    setPage(1);
+                  }}
+                  onReset={() => {
+                    setCategory("all");
+                    setMinPrice(0);
+                    setMaxPrice(10000);
+                    setInStock(false);
+                    setSearch("");
+                    setPage(1);
+                  }}
+                />
+              </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <main className="flex-1 space-y-8">
+              {/* Products Grid */}
+              {loading ? (
+                <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="space-y-4">
+                      <Skeleton className="h-48 sm:h-64 w-full rounded-[2rem]" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                  ))}
+                </div>
+              ) : data.products.length > 0 ? (
+                <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                  {data.products.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={() =>
+                        addToCart({
+                          id: String(product.id),
+                          name: product.name,
+                          price: product.price,
+                          image:
+                            typeof product.mainImage === "object" &&
+                            product.mainImage !== null
+                              ? (product.mainImage as { url?: string }).url || ""
+                              : "",
+                          slug: product.slug || "",
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <NoResults
+                  onClear={() => {
+                    setSearch("");
+                    setCategory("all");
+                    setMinPrice(0);
+                    setMaxPrice(10000);
+                    setInStock(false);
+                    setPage(1);
+                  }}
+                />
+              )}
+
+              {/* Pagination Section */}
+              {data.totalPages > 1 && (
+                <div className="flex justify-center pt-8 sm:pt-12">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => page > 1 && handlePageChange(page - 1)}
+                          className={`cursor-pointer ${page === 1 ? "opacity-50 pointer-events-none" : ""}`}
+                        />
+                      </PaginationItem>
+
+                      {[...Array(data.totalPages)].map((_, i) => {
+                        const p = i + 1;
+                        return (
+                          <PaginationItem key={p} className="hidden sm:inline-block">
+                            <PaginationLink
+                              isActive={page === p}
+                              onClick={() => handlePageChange(p)}
+                              className="cursor-pointer"
+                            >
+                              {p}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() =>
+                            page < data.totalPages && handlePageChange(page + 1)
+                          }
+                          className={`cursor-pointer ${page === data.totalPages ? "opacity-50 pointer-events-none" : ""}`}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </main>
+          </div>
         </div>
       </div>
     </div>

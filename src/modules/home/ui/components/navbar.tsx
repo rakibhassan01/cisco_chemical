@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User, Search, X, ChevronRight } from "lucide-react";
+import { Menu, User, Search, X, ChevronRight, LayoutDashboard } from "lucide-react";
 import { 
   Sheet, 
   SheetContent, 
@@ -277,6 +277,14 @@ export const Navbar = ({ user: initialUser }: NavbarProps) => {
                               </span>
                             </div>
                           </div>
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setIsOpen(false)}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-all shadow-sm"
+                          >
+                            <LayoutDashboard className="w-4 h-4" />
+                            <span>Go to Dashboard</span>
+                          </Link>
                           <button
                             onClick={async () => {
                               await signOutAction();
