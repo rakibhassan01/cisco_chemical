@@ -2,38 +2,40 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, ShoppingCart, LayoutDashboard } from "lucide-react";
-import { useCart } from "@/hooks/use-cart";
+import { Home, Package, ClipboardList, User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { User as UserType } from "@/payload-types";
 
-const navItems = [
-  {
-    label: "Home",
-    href: "/",
-    icon: Home,
-  },
-  {
-    label: "Products",
-    href: "/products",
-    icon: Package,
-  },
-  {
-    label: "Cart",
-    href: "/cart",
-    icon: ShoppingCart,
-    showBadge: true,
-  },
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-];
+interface BottomNavProps {
+  user?: UserType | null;
+}
 
-export const BottomNav = () => {
+export const BottomNav = ({ user }: BottomNavProps) => {
   const pathname = usePathname();
-  const { count } = useCart();
+
+  const navItems = [
+    {
+      label: "Home",
+      href: "/",
+      icon: Home,
+    },
+    {
+      label: "Products",
+      href: "/products",
+      icon: Package,
+    },
+    {
+      label: "Orders",
+      href: "/orders",
+      icon: ClipboardList,
+    },
+    {
+      label: "Account",
+      href: user ? "/dashboard" : "/sign-in",
+      icon: UserIcon,
+    },
+  ];
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[95%] max-w-md">
@@ -77,11 +79,6 @@ export const BottomNav = () => {
                     )} 
                   />
                   
-                  {item.showBadge && count > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[10px] font-bold min-w-[16px] h-[16px] px-1 flex items-center justify-center rounded-full shadow-sm ring-2 ring-white">
-                      {count > 99 ? '99+' : count}
-                    </span>
-                  )}
                 </div>
 
                 <motion.span 

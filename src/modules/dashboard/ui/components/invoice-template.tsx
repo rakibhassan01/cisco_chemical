@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 40,
-    borderWidth: 0,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     borderStyle: "solid",
@@ -62,7 +61,6 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    borderWidth: 0,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     borderStyle: "solid",
@@ -70,7 +68,6 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     backgroundColor: "#f8fafc",
-    borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: "#16a34a",
     borderStyle: "solid",
@@ -85,7 +82,6 @@ const styles = StyleSheet.create({
   totalSection: {
     marginTop: 20,
     paddingTop: 10,
-    borderWidth: 0,
     borderTopWidth: 2,
     borderTopColor: "#eee",
     borderStyle: "solid",
@@ -117,7 +113,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#bbb",
     fontSize: 8,
-    borderWidth: 0,
     borderTopWidth: 1,
     borderTopColor: "#eee",
     borderStyle: "solid",

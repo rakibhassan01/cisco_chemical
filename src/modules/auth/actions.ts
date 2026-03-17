@@ -103,12 +103,9 @@ export async function signInAction(data: { email: string; password: string }) {
 }
 
 export async function signOutAction() {
-  const payload = await getPayload({ config: configPromise });
-  // @ts-expect-error - Payload 3.0 type issues with server actions
-  await payload.logout({
-    collection: "users",
-    res: await cookies(),
-  });
+  const cookieStore = await cookies();
+  cookieStore.delete("payload-token");
+  
   revalidatePath("/", "layout");
   redirect("/sign-in");
 }
